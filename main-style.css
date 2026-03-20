@@ -163,7 +163,7 @@ body.theme-day {
 }
 
 .cats-logo-img {
-    height: 125px; /* Увеличили лого без поломки сетки */
+    height: 135px; /* Увеличили лого еще чуть-чуть для баланса с кольцом */
     width: auto;
     object-fit: contain;
     transform: translateY(0);
@@ -179,8 +179,8 @@ body.theme-day {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    margin-right: 8px; /* Выравнивание по X: совпадение с центром 96px блока иконок */
-    margin-top: 6px; /* Сдвигаем на 2px ниже из-за роста логотипа, чтобы ось Y снова совпала с головами */
+    margin-right: -2px; /* Ось X: центр иконок 48px, центр кольца 50px. Сдвиг на 2px вправо. */
+    margin-top: 0; /* Ось Y: центр кольца 50px, центр голов котиков тоже ~50px */
 }
 
 .logo-ribbon {

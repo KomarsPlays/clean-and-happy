@@ -248,8 +248,11 @@ function getPeriodicTasksForToday() {
 // ===== РЕНДЕР: ДАТА =====
 function renderDate() {
     const { day, full } = formatDate(todayDate());
-    document.getElementById('dateDay').textContent = `| ${day}`;
-    document.getElementById('dateFull').textContent = full;
+    const dayEl = document.getElementById('dateDay');
+    if (dayEl) dayEl.textContent = `| ${day}`;
+    
+    const fullEl = document.getElementById('dateFull');
+    if (fullEl) fullEl.textContent = full;
 }
 
 // ===== РЕНДЕР: ПРОГРЕСС =====

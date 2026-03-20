@@ -147,7 +147,7 @@ body.theme-day {
 .header-main-content {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Центрируем котиков и прогресс по вертикали */
+    align-items: flex-start; /* Поднимаем кольцо, чтобы ось 40px совпала с высотой голов из 108px картинки */
     padding: 0 16px;
     margin-top: 4px;
     width: 100%;
@@ -164,12 +164,12 @@ body.theme-day {
     width: auto;
     object-fit: contain;
     margin-left: -12px;
-    transform: translateY(8px); /* Смещаем вниз, чтобы ось шла по головам, а не центру картинки с текстом */
+    transform: translateY(0); /* Снимаем костыль, выравниваем по верхнему краю */
     transition: transform var(--transition);
 }
 
 .cats-logo-img:hover {
-    transform: translateY(6px) scale(1.05);
+    transform: translateY(-2px) scale(1.05); /* Стандартный ховер */
 }
 
 .progress-ring-wrapper {
@@ -177,6 +177,7 @@ body.theme-day {
     align-items: center;
     justify-content: flex-end;
     margin-right: 8px; /* Выравнивание по X: 48px до центра 96px блока иконок минус 40px радиус кольца = 8px сдвиг влево */
+    margin-top: 4px; /* Чуть опускаем само кольцо, чтобы его центр (40+4=44px) попал точно в центр голов котиков */
 }
 
 .logo-ribbon {

@@ -227,7 +227,7 @@ body.theme-day {
     justify-content: center;
     gap: 4px;
     background: var(--border);
-    color: #e08a5a;
+    color: var(--primary);
     padding: 4px 0;
     border-radius: 10px;
     font-family: var(--font-title);
@@ -2184,18 +2184,8 @@ body.theme-blueberry .cat-thoughts {
     .progress-ring-container {
         width: 60px;
         height: 60px;
-    }
-
-    .progress-ring-container svg {
-        width: 60px;
-        height: 60px;
-    }
-
-    .progress-ring-bg,
-    .progress-ring-fill {
-        cx: 30;
-        cy: 30;
-        r: 25;
+        transform: scale(0.75);
+        transform-origin: center;
     }
 
     .cats-logo-img {

@@ -178,11 +178,9 @@ body.theme-day {
 
 .info-date-sub {
     font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-light);
-    text-transform: lowercase;
-    opacity: 0.75;
+    color: var(--text);
     margin-top: 1px;
 }
 

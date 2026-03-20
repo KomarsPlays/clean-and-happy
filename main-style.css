@@ -163,7 +163,7 @@ body.theme-day {
 }
 
 .cats-logo-img {
-    height: 108px;
+    height: 125px; /* Увеличили лого без поломки сетки */
     width: auto;
     object-fit: contain;
     transform: translateY(0);
@@ -180,7 +180,7 @@ body.theme-day {
     align-items: center;
     justify-content: flex-end;
     margin-right: 8px; /* Выравнивание по X: совпадение с центром 96px блока иконок */
-    margin-top: 4px; /* Чуть опускаем само кольцо, чтобы ось Y совпала с головами */
+    margin-top: 6px; /* Сдвигаем на 2px ниже из-за роста логотипа, чтобы ось Y снова совпала с головами */
 }
 
 .logo-ribbon {

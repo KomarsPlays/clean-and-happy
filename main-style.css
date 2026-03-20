@@ -170,7 +170,7 @@ body.theme-day {
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #F4A97A, #d65e9e);
+    background: linear-gradient(135deg, #c0669b, #af85b6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -202,7 +202,7 @@ body.theme-day {
     font-family: var(--font-title);
     font-size: 1.3rem;
     font-weight: 700;
-    color: #d65e9e;
+    color: #c0669b;
     line-height: 1;
 }
 

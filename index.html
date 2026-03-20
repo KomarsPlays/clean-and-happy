@@ -49,10 +49,9 @@
                     <span class="weather-temp" id="weatherTemp">...</span>
                 </div>
             </div>
-            <!-- По центру: Логотип + баббл -->
+            <!-- По центру: Логотип -->
             <div class="cats-logo-container">
                 <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
-                <div class="cat-thoughts" id="catThoughts">Мурр! Время наводить лоск! 🐾</div>
             </div>
 
             <!-- Справа: Прогресс -->
@@ -80,16 +79,22 @@
     <section class="daily-section">
         <div class="section-header">
             <div class="section-title-row">
-                <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
-                <h2>Утро</h2>
+                <div class="section-title-left">
+                    <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                    <h2>Утро</h2>
+                </div>
+                <div class="cat-thoughts" id="catThoughts">Мурр! Время наводить лоск! 🐾</div>
+                <div class="section-title-right"></div>
             </div>
         </div>
         <ul class="task-list" id="morningTasks"></ul>
 
         <div class="section-header evening-header">
             <div class="section-title-row">
-                <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                <h2>Вечер</h2>
+                <div class="section-title-left">
+                    <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <h2>Вечер</h2>
+                </div>
             </div>
         </div>
         <ul class="task-list" id="eveningTasks"></ul>

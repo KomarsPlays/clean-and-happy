@@ -164,8 +164,7 @@ body.theme-day {
     height: 108px;
     width: auto;
     object-fit: contain;
-    margin-left: -12px;
-    transform: translateY(0); /* Снимаем костыль, выравниваем по верхнему краю */
+    transform: translateY(0);
     transition: transform var(--transition);
 }
 

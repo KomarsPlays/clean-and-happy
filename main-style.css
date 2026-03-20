@@ -188,6 +188,26 @@ body.theme-day {
     border: 1px solid rgba(15, 178, 173, 0.1);
 }
 
+.cat-thoughts {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.75);
+    padding: 3px 12px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    border: 1px solid rgba(15, 178, 173, 0.1);
+}
+
+body.theme-blueberry .cat-thoughts {
+    background: rgba(214, 94, 158, 0.2); /* Легкий малиновый/сиреневый оттенок из палитры */
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 /* Справа: Контролы (Иконки + Прогресс) */
 .header-controls-section {
     display: flex;

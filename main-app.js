@@ -1542,27 +1542,21 @@ function triggerSakura() {
 
 // ===== АВТОМАТИЧЕСКАЯ СМЕНА ТЕМЫ ПО ВРЕМЕНИ СУТОК =====
 function applyTimeTheme() {
+    // ВРЕМЕННО: Фиксируем тему Черника для эскиза
     const hour = new Date().getHours();
     const body = document.body;
-    // Снимаем все темы
     body.classList.remove('theme-day', 'theme-blueberry');
+    
+    body.classList.add('theme-blueberry');   // ПРИНУДИТЕЛЬНО
 
-    // SVG-градиент кольца прогресса
     const stop0 = document.querySelector('#ring-gradient stop:first-child');
     const stop1 = document.querySelector('#ring-gradient stop:last-child');
-
-    if (hour >= 5 && hour < 19) {
-        body.classList.add('theme-day');         // 05:00 — 19:00
-        if (stop0) { stop0.setAttribute('stop-color', '#F4A97A'); }
-        if (stop1) { stop1.setAttribute('stop-color', '#d65e9e'); }
-        // Восстановить звук по пользовательскому выбору
-        state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';
-    } else {
-        body.classList.add('theme-blueberry');   // 20:00 — 05:00
-        if (stop0) { stop0.setAttribute('stop-color', '#c0669b'); }
-        if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
-        state.soundEnabled = false; // Тишина в Чернике
-    }
+    
+    if (stop0) { stop0.setAttribute('stop-color', '#c0669b'); }
+    if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
+    
+    // Оставляем исходный звук, чтобы не ломать логику пользователю
+    state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';
 
     // Обновить иконку динамика
     const btnSound = document.getElementById('btnSound');

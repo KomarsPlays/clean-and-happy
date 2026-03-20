@@ -121,34 +121,62 @@ body.theme-day {
 /* ===== HEADER ===== */
 .app-header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 12px 16px 4px;
+    flex-direction: column;
+    padding: 12px 0 4px;
     background: transparent;
     position: relative;
     z-index: 100;
 }
 
-/* Слева: Логотип (занимает основное место) */
-.header-logo-section {
+/* Верхняя полоска иконок */
+.header-top-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 16px;
+    width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Основной блок: Логотип и кольцо */
+.header-main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Центрируем котиков и прогресс по вертикали */
+    padding: 0 16px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.cats-logo-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    flex: 1; /* Занимает 2/3 свободного места */
-    margin-right: 16px;
 }
 
 .cats-logo-img {
     height: 108px;
     width: auto;
     object-fit: contain;
-    margin: 0;
+    margin-left: -12px;
+    transform: translateY(8px); /* Смещаем вниз, чтобы ось шла по головам, а не центру картинки с текстом */
     transition: transform var(--transition);
 }
 
 .cats-logo-img:hover {
-    transform: translateY(-2px) scale(1.05);
+    transform: translateY(6px) scale(1.05);
+}
+
+.progress-ring-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 8px; /* Выравнивание по X: 48px до центра 96px блока иконок минус 40px радиус кольца = 8px сдвиг влево */
 }
 
 .logo-ribbon {
@@ -162,30 +190,6 @@ body.theme-day {
     letter-spacing: 0.4px;
     box-shadow: 0 2px 6px rgba(165,155,205,0.25);
     text-shadow: 0 1px 1px rgba(0,0,0,0.05);
-    margin-top: -6px; /* Чуть поднимаем ленту */
-}
-
-.cats-logo-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.cat-thoughts {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-top: 5px;
-    background: rgba(255, 255, 255, 0.75);
-    padding: 2px 10px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    opacity: 0.9;
-    animation: fadeIn 0.4s ease;
-    white-space: nowrap;
-    border: 1px solid rgba(15, 178, 173, 0.1);
 }
 
 .cat-thoughts {
@@ -202,20 +206,10 @@ body.theme-day {
 }
 
 body.theme-blueberry .cat-thoughts {
-    background: rgba(214, 94, 158, 0.2); /* Легкий малиновый/сиреневый оттенок из палитры */
+    background: rgba(214, 94, 158, 0.2);
     color: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Справа: Контролы (Иконки + Прогресс) */
-.header-controls-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;
-    gap: 12px; /* Расстояние между иконками и кольцом */
-    flex-shrink: 0;
 }
 
 .header-actions {

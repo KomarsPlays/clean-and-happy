@@ -23,13 +23,8 @@
 
     <!-- Шапка -->
     <header class="app-header">
-        <!-- Слева (Логотип, 2/3) -->
-        <div class="header-logo-section cats-logo-container">
-            <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
-        </div>
-
-        <!-- Справа (Контролы: Иконки + Прогресс) -->
-        <div class="header-controls-section">
+        <!-- Полоска иконок по сетке построения (отдельная ячейка сверху) -->
+        <div class="header-top-bar">
             <div class="header-actions">
                 <button class="btn-sound" id="btnSound" title="Звук">
                     <i class="ph-bold ph-speaker-high"></i>
@@ -41,27 +36,32 @@
                     <i class="ph-bold ph-gear"></i>
                 </button>
             </div>
-            
-            <div class="progress-ring-container">
-                <svg class="progress-ring" width="80" height="80">
-                    <defs>
-                        <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#F4A97A" />
-                            <stop offset="100%" stop-color="#d65e9e" />
-                        </linearGradient>
-                    </defs>
-                    <circle class="progress-ring-bg" cx="40" cy="40" r="34" />
-                    <circle class="progress-ring-fill" id="progressRing" cx="40" cy="40" r="34" />
-                </svg>
-                <div class="progress-inner-circle">
-                    <span class="progress-text" id="progressText">🌱</span>
-                </div>
+        </div>
+
+        <!-- Основной контент шапки (строка ниже) -->
+        <div class="header-main-content">
+            <!-- Слева: Логотип -->
+            <div class="cats-logo-container">
+                <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
             </div>
 
-            <!-- Дата скрыта -->
-            <div class="date-badge" style="display: none;">
-                <span class="date-num" id="dateFull"></span>
-                <span class="date-day" id="dateDay"></span>
+            <!-- Справа: Прогресс -->
+            <div class="progress-ring-wrapper">
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" width="80" height="80">
+                        <defs>
+                            <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#F4A97A" />
+                                <stop offset="100%" stop-color="#d65e9e" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="progress-ring-bg" cx="40" cy="40" r="34" />
+                        <circle class="progress-ring-fill" id="progressRing" cx="40" cy="40" r="34" />
+                    </svg>
+                    <div class="progress-inner-circle">
+                        <span class="progress-text" id="progressText">🌱</span>
+                    </div>
+                </div>
             </div>
         </div>
     </header>

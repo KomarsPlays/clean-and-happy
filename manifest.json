@@ -1,11 +1,12 @@
 {
     "name": "Clean & Happy",
     "short_name": "Clean&Happy",
-    "description": "Совместное приложение для планирования уборки",
-    "start_url": "/",
+    "description": "PWA for daily cleaning routines",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
-    "background_color": "#F0FDFA",
-    "theme_color": "#0891B2",
+    "background_color": "#f3e9e7",
+    "theme_color": "#F4A97A",
     "orientation": "portrait",
     "icons": [
         {

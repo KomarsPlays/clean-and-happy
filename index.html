@@ -23,8 +23,26 @@
 
     <!-- Шапка -->
     <header class="app-header">
-        <!-- Слева: Укрупненное Градиентное Кольцо (80px) -->
-        <div class="header-left">
+        <!-- Слева (Логотип, 2/3) -->
+        <div class="header-logo-section cats-logo-container">
+            <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
+            <div class="cat-thoughts" id="catThoughts">Мурр-мяу! 🐾</div>
+        </div>
+
+        <!-- Справа (Контролы: Иконки + Прогресс) -->
+        <div class="header-controls-section">
+            <div class="header-actions">
+                <button class="btn-sound" id="btnSound" title="Звук">
+                    <i class="ph-bold ph-speaker-high"></i>
+                </button>
+                <button class="btn-calendar" id="btnCalendar" title="Календарь">
+                    <i class="ph-bold ph-calendar-blank"></i>
+                </button>
+                <button class="btn-settings" id="btnSettings" title="Настройки">
+                    <i class="ph-bold ph-gear"></i>
+                </button>
+            </div>
+            
             <div class="progress-ring-container">
                 <svg class="progress-ring" width="80" height="80">
                     <defs>
@@ -40,30 +58,9 @@
                     <span class="progress-text" id="progressText">🌱</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Центр: Логотип Пользователя -->
-        <div class="header-center">
-            <div class="cats-logo-container">
-                <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
-                <div class="cat-thoughts" id="catThoughts">Мурр-мяу! 🐾</div>
-            </div>
-        </div>
-
-        <!-- Справа: Действия и Дата -->
-        <div class="header-right">
-            <div class="header-actions">
-                <button class="btn-sound" id="btnSound" title="Звук">
-                    <i class="ph-bold ph-speaker-high"></i>
-                </button>
-                <button class="btn-calendar" id="btnCalendar" title="Календарь">
-                    <i class="ph-bold ph-calendar-blank"></i>
-                </button>
-                <button class="btn-settings" id="btnSettings" title="Настройки">
-                    <i class="ph-bold ph-gear"></i>
-                </button>
-            </div>
-            <div class="date-badge">
+            <!-- Дата скрыта -->
+            <div class="date-badge" style="display: none;">
                 <span class="date-num" id="dateFull"></span>
                 <span class="date-day" id="dateDay"></span>
             </div>

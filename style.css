@@ -1,0 +1,2174 @@
+/* ===== СТАРАЯ ПАЛИТРА (БЭКАП ДЛЯ ВОЗВРАТА) =====
+:root {
+    --primary: #C4A4D8;
+    --primary-light: #E0C8F0;
+    --primary-dark: #A87CC0;
+    --accent: #F4B8C1;
+    --accent-light: #FADDE1;
+    --bg: #FDF6FF;
+    --bg-card: #FFFFFF;
+    --text: #5D4E6D;
+    --text-light: #8B7A9E;
+    --text-muted: #B8AAC8;
+    --border: #F0E4F7;
+
+    --zone-kitchen: #F4A97A;
+    --zone-kitchen-light: #F9C9A3;
+    --zone-room: #A8B8F0;
+    --zone-room-light: #C4D0F8;
+    --zone-bathroom: #80D4C0;
+    --zone-bathroom-light: #A8E4D4;
+    --zone-hallway: #C8A8E8;
+    --zone-hallway-light: #DCC8F0;
+
+    --font-title: 'Fredoka', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+
+    --shadow-sm: 0 2px 8px rgba(196, 164, 216, 0.1);
+    --shadow-md: 0 4px 16px rgba(196, 164, 216, 0.15);
+    --shadow-lg: 0 8px 32px rgba(196, 164, 216, 0.2);
+    --shadow-glow: 0 0 20px rgba(244, 184, 193, 0.3);
+
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 26px;
+    --radius-full: 50%;
+
+    --transition: 200ms ease;
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+*/
+
+/* ===== НОВАЯ ПАЛИТРА (ТОЧНО ПО РЕФЕРЕНСУ) ===== */
+:root {
+    /* Левые нейтральные цвета */
+    --palette-light-neutral: #f3e9e7; /* Светлая база */
+    --palette-dark-neutral: #bda79a;  /* Темная база (тауп) */
+
+    /* Основные цвета (Точные замеры Pillow) */
+    --primary: #F4A97A;         /* Персиковый */
+    --primary-light: #f9c9a3;   /* Персиковый пастель */
+    --primary-dark: #e0875a;
+    --accent: #ef726c;          /* Коралл / Красный */
+    --accent-light: #f8bcbc;    /* Розовый пастель */
+    --bg: #f3e9e7;              /* Фон на основе светлого нейтрала */
+    --bg-card: #FFFFFF;
+    --text: #4B3E37;            
+    --text-light: #8A7B73;
+    --text-muted: #bda79a;
+    --border: #e8deda;          /* Чуть темнее светлой базы для границ */
+
+    /* Цвета зон — точные замеры */
+    --zone-kitchen: #e5c51a;          /* Желтый */
+    --zone-kitchen-light: #f7ebb7;
+    --zone-room: #d65e9e;             /* Малиновый */
+    --zone-room-light: #f8c8e0;
+    --zone-bathroom: #67a4db;          /* Синий */
+    --zone-bathroom-light: #c4d8f4;
+    --zone-hallway: #a59bcd;           /* Фиолет */
+    --zone-hallway-light: #ead1e6;
+
+    /* Кольцо прогресса (Самый правый внизу) */
+    --progress-color: #d65e9e;        /* Малина */
+
+    /* Типография */
+    --font-title: 'Fredoka', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+
+    /* Тени */
+    --shadow-sm: 0 2px 8px rgba(187, 166, 151, 0.1);
+    --shadow-md: 0 4px 16px rgba(187, 166, 151, 0.15);
+    --shadow-lg: 0 8px 32px rgba(187, 166, 151, 0.2);
+    --shadow-glow: 0 0 20px rgba(248, 113, 113, 0.2);
+
+    /* Константы */
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 26px;
+    --radius-full: 50%;
+    --transition: 200ms ease;
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-body);
+    background: linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 100%); /* По умолчанию: День */
+    color: var(--text);
+    min-height: 100dvh;
+    padding-bottom: 40px;
+    overflow-x: hidden;
+    transition: background 1.2s ease, color 0.8s ease; /* Плавная смена тем */
+}
+
+/* ===== ТЕМА: ДЕНЬ (05:00 — 20:00) ===== */
+body.theme-day {
+    background: linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 100%);
+    color: var(--text);
+}
+
+/* ===== HEADER ===== */
+.app-header {
+    display: grid;
+    grid-template-columns: 80px 1fr auto; /* Поднял до 80px под укрупненное кольцо */
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px 2px; /* Подрезал пустоту снизу */
+    background: transparent;
+    position: relative;
+    z-index: 100;
+}
+
+/* Слева: Микро-прогресс */
+.header-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px; /* Увеличено с 60px под градиент 80px */
+    height: 80px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg); /* Старт анимации сверху */
+}
+
+
+/* Центр: Новый логотип */
+.header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cats-logo-img {
+    height: 108px; /* Увеличено в 1.5 раза для крупного вида */
+    width: auto;
+    object-fit: contain;
+    margin: 0;
+    transition: transform var(--transition);
+    transform: translateY(12px); /* Опустили логотип еще ниже */
+}
+
+.cats-logo-img:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.logo-ribbon {
+    background: var(--primary);
+    color: white;
+    padding: 3px 14px;
+    border-radius: 20px;
+    font-family: var(--font-title);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 6px rgba(165,155,205,0.25);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.cats-logo-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cat-thoughts {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 5px; /* Зазор от картинки котиков */
+    background: rgba(255, 255, 255, 0.75);
+    padding: 2px 10px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    opacity: 0.9;
+    animation: fadeIn 0.4s ease;
+    white-space: nowrap;
+    border: 1px solid rgba(15, 178, 173, 0.1);
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Дата растянется по ширине иконок */
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.date-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: var(--border);
+    color: #e08a5a;
+    padding: 4px 0;
+    border-radius: 10px;
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(196, 164, 216, 0.25);
+    width: 100%;
+}
+
+.date-day {
+    font-weight: 700;
+}
+
+.date-num {
+    opacity: 0.9;
+}
+
+.btn-settings, .btn-calendar, .btn-sound {
+    background: var(--border);
+    border: none;
+    color: #F4A97A;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px; /* Квадратик со скруглёнными углами */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-settings svg, .btn-calendar svg, .btn-sound svg {
+    stroke: #F4A97A !important;
+}
+
+.btn-settings:hover, .btn-calendar:hover, .btn-sound:hover {
+    background: rgba(255,255,255,0.9);
+    transform: scale(1.05);
+}
+
+/* ===== PROGRESS SECTION ===== */
+.progress-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin: 12px 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.progress-ring-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 6;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: url(#ring-gradient);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 213.6;
+    stroke-dashoffset: 213.6;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-inner-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: transparent; /* Невидимый по умолчанию (Капучино/Персик) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.8s ease;
+}
+
+.progress-text {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e08a5a;
+}
+
+.progress-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progress-label {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.cat-mood {
+    font-size: 1.6rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+/* ===== DAILY SECTION ===== */
+.daily-section {
+    padding: 0 16px;
+    margin-top: 0; /* Убрано прилипание */
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0 8px; /* Уменьшено с 12px для плотности */
+}
+
+.section-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-icon {
+    color: #e08a5a;
+}
+
+.section-header h2 {
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.evening-header {
+    margin-top: 8px;
+}
+
+/* ===== TASK LIST ===== */
+.task-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-radius: 0; /* Острые углы */
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.task-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.task-item.completed {
+    opacity: 0.55;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.task-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 2.5px solid var(--primary-light);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.task-checkbox.checked {
+    background: var(--zone-bathroom);
+    border-color: var(--zone-bathroom);
+    animation: pop 0.3s ease;
+}
+
+.task-checkbox.checked::after {
+    content: '';
+    width: 8px;
+    height: 12px;
+    border: 2.5px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+}
+
+.task-text {
+    font-size: 0.95rem;
+    flex: 1;
+    line-height: 1.3;
+}
+
+/* ===== ZONE SECTION ===== */
+.zone-section {
+    padding: 0 16px;
+    margin-top: 16px;
+}
+
+
+.zone-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* ===== ZONE TILE ===== */
+.zone-tile {
+    border-radius: 0; /* Острые углы */
+    padding: 16px;
+    aspect-ratio: 1 / 1; /* КВАДРАТ 📸 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid transparent;
+}
+
+.zone-tile:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.zone-tile:active {
+    transform: scale(0.96);
+}
+
+.zone-tile.completed {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.zone-checkmark {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: transparent; /* Убираем круглый фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
+}
+
+/* Цвет галочки совпадает с цветом зоны */
+.zone-kitchen .zone-checkmark { color: var(--zone-kitchen); }
+.zone-room .zone-checkmark { color: var(--zone-room); }
+.zone-bathroom .zone-checkmark { color: var(--zone-bathroom); }
+.zone-hallway .zone-checkmark { color: var(--zone-hallway); }
+
+.zone-tile.completed .zone-checkmark {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+}
+
+.zone-tile.completed .zone-tile-name,
+.zone-tile.completed .zone-tile-badge {
+    color: var(--text) !important;
+    text-shadow: none !important;
+    filter: none;
+}
+
+/* Иконки выполненных плиток — мягкая тёплая тень для воздушности */
+.zone-tile.completed .zone-tile-icon {
+    color: var(--text-light) !important;
+    filter: drop-shadow(0 1px 3px rgba(244, 169, 122, 0.3));
+}
+
+.zone-tile-icon {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.zone-tile-name {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.25;
+    flex: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.zone-tile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.8);
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+/* Зоны — сочные однотонные плашки */
+.zone-kitchen {
+    background: var(--zone-kitchen);
+    box-shadow: var(--shadow-md);
+    border-color: var(--zone-kitchen);
+}
+.zone-room {
+    background: var(--zone-room);
+    box-shadow: var(--shadow-md);
+    border-color: var(--zone-room);
+}
+.zone-bathroom {
+    background: var(--zone-bathroom);
+    box-shadow: var(--shadow-md);
+    border-color: var(--zone-bathroom);
+}
+.zone-hallway {
+    background: var(--zone-hallway);
+    box-shadow: var(--shadow-md);
+    border-color: var(--zone-hallway);
+}
+
+/* ===== ПРОСРОЧЕННЫЕ ЗАДАЧИ ===== */
+.zone-tile.overdue {
+    box-shadow: 0 4px 16px rgba(239, 114, 108, 0.3) !important;
+}
+
+.overdue-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #ef726c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-title);
+    font-size: 0.85rem;
+    font-weight: 800;
+    z-index: 3;
+    animation: overdue-pulse 2s ease-in-out infinite;
+}
+
+@keyframes overdue-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* Мульти-зонный градиент удален в пользу однотонной заливки */
+.zone-multi {
+    border-color: var(--primary);
+}
+
+
+/* ===== ПОПАП "ПЕРЕДВИНУТЬ" ===== */
+.postpone-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlay-fade 0.2s ease;
+}
+
+@keyframes overlay-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.postpone-popup {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+    padding: 20px 24px;
+    min-width: 220px;
+    text-align: center;
+    animation: popup-appear 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popup-appear {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.postpone-title {
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+.postpone-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.postpone-label {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.postpone-input {
+    width: 50px;
+    padding: 4px 6px;
+    font-size: 1.1rem;
+    font-family: var(--font-title);
+    font-weight: 700;
+    border: 1.5px solid var(--primary);
+    border-radius: 8px;
+    outline: none;
+    text-align: center;
+    background: var(--bg);
+    color: var(--text);
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.postpone-input::-webkit-inner-spin-button,
+.postpone-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.postpone-submit {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-title);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.postpone-submit:hover {
+    background: var(--primary-dark);
+    transform: scale(1.02);
+}
+
+.postpone-submit:active {
+    transform: scale(0.97);
+}
+
+/* ===== UNDO TOAST ===== */
+.undo-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(40, 40, 40, 0.92);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 28px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 200;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.undo-toast.visible {
+    transform: translateX(-50%) translateY(0);
+}
+
+.undo-toast button {
+    background: none;
+    border: none;
+    color: #F4A97A;
+    font-family: var(--font-title);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== КНОПКА "СДЕЛАЛА ЕЩЁ" ===== */
+.btn-extra-done {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 16px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px dashed rgba(244, 169, 122, 0.35);
+    border-radius: var(--radius-sm);
+    color: #F4A97A;
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    backdrop-filter: blur(4px);
+}
+
+.btn-extra-done:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(244, 169, 122, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-extra-done.active {
+    background: rgba(244, 169, 122, 0.1);
+    border-style: solid;
+    border-color: #F4A97A;
+}
+
+.btn-extra-done i {
+    font-size: 1.1rem;
+}
+
+/* Раскрывающийся список */
+.extra-done-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.3s ease;
+    margin-top: 0;
+}
+
+.extra-done-list.open {
+    max-height: 500px;
+    margin-top: 8px;
+}
+
+.extra-done-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.extra-done-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+}
+
+.extra-done-item:active {
+    transform: scale(0.97);
+}
+
+.extra-done-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.extra-done-name {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.extra-done-zone {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.extra-done-empty {
+    text-align: center;
+    padding: 12px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-slow);
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform var(--transition-slow);
+}
+
+.modal-overlay.open .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.modal-header h2 {
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    transition: color var(--transition);
+}
+
+.btn-close:hover {
+    color: var(--text);
+}
+
+/* ===== SETTINGS TABS ===== */
+.settings-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-light);
+    background: transparent;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.tab-btn.active {
+    background: var(--bg-card);
+    color: #e08a5a;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content h3 {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 12px 0 8px;
+    color: var(--text);
+}
+
+/* ===== SETTINGS TASK LIST ===== */
+.settings-task-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.settings-task-item .task-name {
+    flex: 1;
+    cursor: pointer;
+    border-bottom: 1px dashed transparent;
+    transition: all 0.2s ease;
+}
+
+.settings-task-item .task-name:hover {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.name-input {
+    width: 100%;
+    padding: 2px 6px;
+    font-size: 0.9rem;
+    font-family: var(--font-body);
+    border: 1.5px solid var(--primary);
+    border-radius: 4px;
+    outline: none;
+    background: var(--bg-card);
+    color: var(--text);
+}
+
+.settings-task-item .task-interval {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    border-bottom: 1px dashed transparent;
+    transition: all 0.2s ease;
+}
+
+.settings-task-item .task-interval:hover {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.interval-input {
+    width: 48px;
+    padding: 2px 4px;
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    border: 1.5px solid var(--primary);
+    border-radius: 4px;
+    outline: none;
+    text-align: center;
+    background: var(--bg-card);
+    color: var(--text);
+    -moz-appearance: textfield;
+}
+
+.interval-input::-webkit-inner-spin-button,
+.interval-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.settings-task-item .task-zones-badges {
+    display: flex;
+    gap: 3px;
+}
+
+.zone-badge {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+}
+
+.btn-delete-task {
+    background: none;
+    border: none;
+    color: #EF4444;
+    cursor: pointer;
+    padding: 4px;
+    opacity: 0.6;
+    transition: opacity var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-delete-task:hover {
+    opacity: 1;
+}
+
+/* ===== ADD TASK ===== */
+.add-task-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.input-add {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.input-add:focus {
+    border-color: var(--primary-light);
+}
+
+.input-wide {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.btn-add {
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 1.4rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.btn-add:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+/* ===== ADD PERIODIC FORM ===== */
+.add-periodic-form {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.form-row label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-number, .input-select {
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--transition);
+    min-width: 100px;
+}
+
+.input-number:focus, .input-select:focus {
+    border-color: var(--primary-light);
+}
+
+.zone-checkboxes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.zone-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.zone-checkbox-label input[type="checkbox"] {
+    accent-color: var(--primary);
+}
+
+.btn-add-periodic {
+    width: 100%;
+    padding: 10px;
+    margin-top: 12px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-add-periodic:hover {
+    background: var(--accent-light);
+    transform: translateY(-1px);
+}
+
+/* ===== CONFETTI ===== */
+#confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confetti-fall 1.5s ease-out forwards;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+@keyframes confetti-fall {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(300px) rotate(720deg);
+    }
+}
+
+@keyframes slide-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item {
+    animation: slide-in 0.15s ease both;
+}
+
+/* Плитки зон — без анимации, мгновенное появление */
+.zone-tile {
+    animation: none;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.empty-state-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+/* ===== DECORATIVE SPARKLES ===== */
+.progress-section::after {
+    content: '✦';
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    font-size: 0.7rem;
+    color: var(--accent);
+    opacity: 0.5;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.progress-section {
+    position: relative;
+}
+
+.zone-tile::after {
+    content: '◇';
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    font-size: 0.6rem;
+    color: rgba(0,0,0,0.15);
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+.zone-tile:nth-child(even)::after {
+    content: '✦';
+    animation-delay: 1s;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.3); }
+}
+
+/* ===== SECTION SPARKLE DECORATORS ===== */
+.section-header h2::after {
+    content: ' ✦';
+    font-size: 0.6em;
+    opacity: 0.6;
+}
+
+/* Варьируем цвет звёздочек по секциям */
+.daily-section .section-header:first-child h2::after {
+    color: #F4A97A; /* Утро — персиковая */
+}
+.daily-section .evening-header h2::after {
+    color: #d65e9e; /* Вечер — малиновая */
+}
+.zone-section .section-header h2::after {
+    color: #a59bcd; /* Задачи — фиолетовая */
+}
+
+/* ===== CALENDAR BUTTON ===== */
+.btn-calendar {
+    background: rgba(255,255,255,0.6);
+    border: none;
+    color: var(--primary-dark);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px; /* Квадратик как остальные */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-calendar:hover {
+    background: rgba(255,255,255,0.7);
+    transform: scale(1.1);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ===== CALENDAR MODAL ===== */
+.cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 12px;
+}
+
+.cal-nav-title {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.cal-nav-btn {
+    background: rgba(244, 169, 122, 0.15);
+    border: none;
+    color: #e08a5a;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.cal-nav-btn:hover {
+    background: rgba(244, 169, 122, 0.2);
+    color: #e08a5a;
+}
+
+/* Сетка дней */
+.cal-grid {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.cal-grid.week-view {
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.cal-grid.month-view {
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.cal-day-label {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 4px 0;
+    text-transform: uppercase;
+}
+
+.cal-day {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    position: relative;
+    overflow: hidden; /* Сдерживаем градиент внутри углов */
+    z-index: 1;
+    aspect-ratio: 1 / 1; /* Возвращаем квадратность! */
+    display: flex;       /* Центрируем содержимое */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+/* ===== ЗАЛИВКА ПРОГРЕССА В КАЛЕНДАРЕ ===== */
+.cal-day-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--pct) * 1%);
+    background: linear-gradient(180deg, rgba(229, 197, 26, 0.4) 0%, rgba(214, 94, 158, 0.4) 100%); /* Плотнее солнце и малина (40%) */
+    transition: height 0.6s ease-out; /* Плавное мягкое наполнение */
+    z-index: -1; /* Позади цифры */
+}
+
+.cal-day-num {
+    position: relative;
+    z-index: 2;
+}
+
+.cal-day-dot {
+    z-index: 2;
+}
+
+.cal-day:hover {
+    background: var(--border);
+}
+
+.cal-day.today {
+    background: transparent !important;
+    border: 2.5px solid #F4A97A; /* Бирюзовая обводка под цвет шапки */
+    font-weight: 800;
+}
+
+.cal-day.selected {
+    background: rgba(244, 169, 122, 0.08) !important;
+    border: 2.5px dashed #F4A97A; /* Пунктирная кайма для выделенной даты */
+}
+
+.cal-day.other-month {
+    opacity: 0.3;
+}
+
+.cal-day .cal-day-dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: 3px auto 0;
+}
+
+.cal-day.has-many .cal-day-dot {
+    background: var(--zone-kitchen);
+}
+
+/* Задачи выбранного дня */
+.cal-day-tasks {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.cal-day-tasks h3 {
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.cal-task-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cal-task-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.cal-task-item .zone-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cal-task-item .task-name {
+    flex: 1;
+}
+
+.cal-task-item .task-interval-badge {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+    body {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .zone-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 374px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .zone-grid {
+        gap: 8px;
+    }
+
+    .zone-tile {
+        padding: 10px;
+        aspect-ratio: 1 / 1; /* КВАДРАТ 📸 */
+    }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ===== ZONE ICONS (Phosphor) ===== */
+.zone-tile-icon {
+    font-size: 28px; /* Крупный размер на замену эмодзи */
+    margin-bottom: 6px;
+    color: white; /* Контраст на цветном фоне плитки */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+
+/* На выполненной (прозрачной) плитке иконка цвета рамки/зоны */
+.zone-tile.completed .zone-tile-icon {
+    color: currentColor; 
+}
+
+/* ===== КОРРЕКЦИЯ КНОПОК В ШАПКЕ ===== */
+.btn-settings i, .btn-calendar i, .btn-sound i {
+    color: #F4A97A !important; /* Синхронизация с бирюзовой темой */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 24px;
+}
+
+/* ===== МИКРОАНИМАЦИИ КЛИКА (МЯГКОЕ НАЖАТИЕ) ===== */
+.task-item, .zone-tile {
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important;
+}
+
+.task-item:active, .zone-tile:active {
+    transform: scale(0.98) !important; /* Еле заметное мягкое нажатие (2%) */
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Плавная смена фона между темами */
+body {
+    transition: background 1.2s ease;
+}
+
+/* ===== САКУРА САЛЮТ ===== */
+@keyframes sakuraExplode {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.3) rotate(var(--rot));
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--dx) * 1.3), calc(-50% + var(--dy) + 180px)) scale(0.7) rotate(calc(var(--rot) * 2.5));
+        opacity: 0;
+    }
+}
+
+.sakura-petal {
+    position: fixed;
+    font-size: 1.6rem;
+    pointer-events: none;
+    z-index: 10000;
+    opacity: 0;
+    animation: sakuraExplode 2.2s cubic-bezier(0.12, 0.85, 0.3, 1) forwards;
+}
+
+/* ===== ЖИВАЯ РЕАКЦИЯ КОТИКОВ ===== */
+@keyframes catReact {
+    0% { transform: translateY(12px) scale(1); }
+    40% { transform: translateY(9px) scale(1.03); } /* Деликатно с 12px до 9px */
+    100% { transform: translateY(12px) scale(1); }
+}
+
+.cats-logo-img.react {
+    animation: catReact 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Чуть шустрее и мягче */
+}
+
+/* ===== СПОЙЛЕР ЕЖЕДНЕВНЫХ ЗАДАЧ В КАЛЕНДАРЕ ===== */
+.cal-daily-details {
+    margin-bottom: 12px;
+    border: 1px solid rgba(15, 178, 173, 0.15); /* Еле заметная бирюзовая кайма */
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.4);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.cal-daily-summary {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none; /* Убираем стрелку */
+}
+
+/* Убиваем стандартную стрелку в Chrome/Apple */
+.cal-daily-summary::-webkit-details-marker {
+    display: none;
+}
+
+.cal-daily-summary::after {
+    content: '▼';
+    font-size: 0.65rem;
+    color: #F4A97A;
+    transition: transform 0.2s ease;
+}
+
+.cal-daily-details[open] .cal-daily-summary {
+    border-bottom: 1.5px dashed rgba(244, 169, 122, 0.2);
+}
+
+.cal-daily-details[open] .cal-daily-summary::after {
+    transform: rotate(180deg);
+}
+
+.cal-daily-inner-list {
+    list-style: none;
+    padding: 4px 10px 10px;
+}
+
+/* Тонкие разделители внутри списков */
+.cal-daily-inner-list .cal-task-item {
+    margin-bottom: 4px;
+    padding: 6px 4px;
+    border-bottom: 1px dashed rgba(0,0,0,0.03);
+    font-size: 0.82rem;
+}
+
+.cal-daily-inner-list .cal-task-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* ===== ТЕМА: ЧЕРНИКА (21:00 — 05:00) [В КОНЦЕ ДЛЯ КАСКАДА] ===== */
+body.theme-blueberry {
+    background: linear-gradient(180deg, #d1aba9 0%, #af85b6 100%);
+    color: #fef0ee;
+}
+
+body.theme-blueberry .task-item {
+    background: rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-blueberry .task-text,
+body.theme-blueberry .zone-tile-name {
+    color: var(--text);
+}
+
+body.theme-blueberry .section-header h2,
+body.theme-blueberry .section-icon {
+    color: #fef0ee;
+}
+
+body.theme-blueberry .task-item.completed {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.theme-blueberry .task-item.completed .task-text {
+    color: rgba(254, 240, 238, 0.45);
+}
+
+body.theme-blueberry .zone-tile-badge {
+    color: rgba(254, 240, 238, 0.7);
+}
+
+body.theme-blueberry .progress-ring-bg {
+    stroke: rgba(255, 255, 255, 0.25);
+}
+
+body.theme-blueberry .progress-text {
+    color: #fef0ee;
+}
+
+body.theme-blueberry .progress-inner-circle {
+    background: rgba(255, 255, 255, 0.35) !important;
+}
+
+body.theme-blueberry .date-badge {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.theme-blueberry .btn-settings,
+body.theme-blueberry .btn-calendar,
+body.theme-blueberry .btn-sound {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .btn-settings i,
+body.theme-blueberry .btn-calendar i,
+body.theme-blueberry .btn-sound i {
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .task-checkbox {
+    border-color: #c0669b !important;
+}
+
+body.theme-blueberry .task-checkbox.checked {
+    background: #c0669b !important;
+    border-color: #c0669b !important;
+}
+
+/* ===== ЧЕРНИКА: МОДАЛЬНЫЕ ОКНА (НАСТРОЙКИ + КАЛЕНДАРЬ) ===== */
+body.theme-blueberry .modal-content {
+    background: linear-gradient(180deg, #d1aba9 0%, #c49ab5 100%) !important;
+    color: #fef0ee;
+}
+
+body.theme-blueberry .modal-header h2 {
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .btn-close {
+    color: rgba(254, 240, 238, 0.7) !important;
+}
+
+/* Вкладки */
+body.theme-blueberry .settings-tabs {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-blueberry .tab-btn {
+    color: rgba(254, 240, 238, 0.85) !important;
+}
+
+body.theme-blueberry .tab-btn.active {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #3d2a35 !important;
+    box-shadow: none !important;
+}
+
+/* Заголовки секций */
+body.theme-blueberry .tab-content h3 {
+    color: #fef0ee !important;
+}
+
+/* Элементы списка задач в настройках */
+body.theme-blueberry .settings-task-item {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fef0ee;
+}
+
+/* Поля ввода */
+body.theme-blueberry .input-add,
+body.theme-blueberry .input-number,
+body.theme-blueberry .input-select {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .input-add::placeholder {
+    color: rgba(254, 240, 238, 0.4) !important;
+}
+
+/* Кнопки */
+body.theme-blueberry .btn-add {
+    background: #c0669b !important;
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .btn-add-periodic {
+    background: #c0669b !important;
+    color: #fef0ee !important;
+}
+
+/* Лейблы форм */
+body.theme-blueberry .form-row label {
+    color: rgba(254, 240, 238, 0.8) !important;
+}
+
+/* Календарь: навигация */
+body.theme-blueberry .cal-nav-title {
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .cal-nav-btn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fef0ee !important;
+}
+
+/* Календарь: сетка */
+body.theme-blueberry .cal-day-header {
+    color: rgba(254, 240, 238, 0.5) !important;
+}
+
+body.theme-blueberry .cal-day {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .cal-day.today {
+    background: rgba(192, 102, 155, 0.4) !important;
+    border-color: #c0669b !important;
+}
+
+body.theme-blueberry .cal-day.has-data {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.theme-blueberry .cal-day.selected {
+    background: #c0669b !important;
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .cal-day.other-month {
+    color: rgba(254, 240, 238, 0.25) !important;
+}
+
+/* Календарь: детали дня */
+body.theme-blueberry .cal-day-tasks h3 {
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .cal-task-item {
+    color: rgba(254, 240, 238, 0.85) !important;
+}
+
+body.theme-blueberry .cal-daily-details {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-blueberry .cal-daily-summary {
+    color: #fef0ee !important;
+}
+
+body.theme-blueberry .cal-daily-summary::after {
+    color: #c0669b !important;
+}
+
+/* Firebase статус */
+body.theme-blueberry #fbStatus {
+    color: rgba(254, 240, 238, 0.7) !important;
+}
+
+/* Убираем бирюзу из календаря */
+body.theme-blueberry .cal-day.today {
+    border-color: #c0669b !important;
+}
+
+body.theme-blueberry .cal-day.selected {
+    border-color: #c0669b !important;
+}
+
+body.theme-blueberry .cal-day .cal-day-dot {
+    background: #c0669b !important;
+}
+
+body.theme-blueberry .cal-daily-details {
+    border-color: rgba(192, 102, 155, 0.3) !important;
+}
+
+body.theme-blueberry .cal-daily-details[open] .cal-daily-summary {
+    border-bottom-color: rgba(192, 102, 155, 0.3) !important;
+}
+
+/* Текст периодических задач в календаре — контрастный */
+body.theme-blueberry .cal-task-list .cal-task-item {
+    color: #3d2a35 !important;
+}
+
+/* Иконки и SVG в шапке */
+body.theme-blueberry .btn-settings svg,
+body.theme-blueberry .btn-calendar svg,
+body.theme-blueberry .btn-sound svg {
+    stroke: #fef0ee !important;
+}
+
+/* Секция прогресса — звёздочки */
+body.theme-blueberry .section-header h2::after {
+    color: #c0669b !important;
+}
+
+/* ===== ДЕНЬ: СОЛНЫШКО + ОБЛАЧКА ЗА КОТИКАМИ ===== */
+body.theme-day .cats-logo-container::after {
+    content: '☀️';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    animation: sunPulse 3s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body.theme-day .cats-logo-container::before {
+    content: '☁️ ✦ ☁️';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.5rem;
+    letter-spacing: 10px;
+    color: rgba(229, 197, 26, 0.4);
+    animation: twinkle 4s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes sunPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1) translateY(0); }
+    50% { opacity: 0.85; transform: scale(1.05) translateY(-4px); }
+}
+
+/* ===== ДЕНЬ: ПРОРАБОТКА ЭЛЕМЕНТОВ ===== */
+
+/* Плашки задач — тёплые полупрозрачные */
+body.theme-day .task-item {
+    background: rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 2px 12px rgba(244, 184, 193, 0.15) !important;
+}
+
+body.theme-day .task-item.completed {
+    background: rgba(255, 255, 255, 0.35) !important;
+}
+
+body.theme-day .task-item.completed .task-text {
+    color: var(--text-muted);
+}
+
+/* Чекбоксы — персиковый акцент */
+body.theme-day .task-checkbox {
+    border-color: #F4A97A !important;
+}
+
+body.theme-day .task-checkbox.checked {
+    background: #F4A97A !important;
+    border-color: #F4A97A !important;
+}
+
+/* Кнопки шапки — матовое стекло с персиковым акцентом */
+body.theme-day .btn-settings,
+body.theme-day .btn-calendar,
+body.theme-day .btn-sound {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1.5px solid rgba(244, 169, 122, 0.2) !important;
+    color: #F4A97A !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+body.theme-day .btn-settings i,
+body.theme-day .btn-calendar i,
+body.theme-day .btn-sound i {
+    color: #F4A97A !important;
+}
+
+body.theme-day .btn-settings svg,
+body.theme-day .btn-calendar svg,
+body.theme-day .btn-sound svg {
+    stroke: #F4A97A !important;
+}
+
+body.theme-day .btn-settings:hover,
+body.theme-day .btn-calendar:hover,
+body.theme-day .btn-sound:hover {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(244, 169, 122, 0.4) !important;
+    box-shadow: 0 2px 12px rgba(244, 169, 122, 0.2) !important;
+}
+
+/* Бейдж даты — ровный персиковый акцент */
+body.theme-day .date-badge {
+    background: #F4A97A !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(244, 169, 122, 0.25) !important;
+    border: none !important;
+}
+
+/* Прогресс-кольцо — тёплый кремовый градиент */
+body.theme-day .progress-inner-circle {
+    background: linear-gradient(135deg, rgba(244, 169, 122, 0.25) 0%, rgba(214, 94, 158, 0.2) 100%) !important;
+}
+
+body.theme-day .progress-ring-bg {
+    stroke: rgba(244, 169, 122, 0.2);
+}
+
+/* Секционные звёздочки — варьируются по секциям (см. базовые стили) */
+
+/* Мысли котиков — тёплые кремовые */
+body.theme-day .cat-thoughts {
+    background: rgba(255, 255, 255, 0.65) !important;
+    color: var(--text) !important;
+    border-color: rgba(244, 169, 122, 0.2) !important;
+}
+
+/* ===== ДЕНЬ: МОДАЛЬНЫЕ ОКНА ===== */
+body.theme-day .modal-content {
+    background: linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 100%) !important;
+}
+
+body.theme-day .settings-tabs {
+    background: rgba(244, 169, 122, 0.12) !important;
+}
+
+body.theme-day .tab-btn.active {
+    background: rgba(255, 255, 255, 0.85) !important;
+    color: #e08a5a !important;
+    box-shadow: 0 2px 8px rgba(244, 169, 122, 0.15) !important;
+}
+
+body.theme-day .settings-task-item {
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.theme-day .btn-add {
+    background: #F4A97A !important;
+    color: white !important;
+}
+
+body.theme-day .btn-add-periodic {
+    background: #F4A97A !important;
+    color: white !important;
+}
+
+body.theme-day .input-add:focus,
+body.theme-day .input-number:focus,
+body.theme-day .input-select:focus {
+    border-color: #F4A97A !important;
+}
+
+/* ===== ДЕНЬ: КАЛЕНДАРЬ ===== */
+body.theme-day .cal-day.today {
+    border-color: #F4A97A !important;
+}
+
+body.theme-day .cal-day.selected {
+    border-color: #F4A97A !important;
+    background: rgba(244, 169, 122, 0.08) !important;
+}
+
+body.theme-day .cal-day .cal-day-dot {
+    background: #F4A97A !important;
+}
+
+body.theme-day .cal-daily-details {
+    border-color: rgba(244, 169, 122, 0.2) !important;
+}
+
+body.theme-day .cal-daily-details[open] .cal-daily-summary {
+    border-bottom-color: rgba(244, 169, 122, 0.2) !important;
+}
+
+body.theme-day .cal-daily-summary::after {
+    color: #F4A97A !important;
+}
+
+body.theme-day .cal-nav-btn:hover {
+    background: rgba(244, 169, 122, 0.2) !important;
+}
+
+/* ===== ЧЕРНИКА: ЗВЁЗДНОЕ НЕБО ЗА КОТИКАМИ ===== */
+body.theme-blueberry .cats-logo-container::before {
+    content: '✦ ⋆ ✧ ⋆ ✦ ⋆ ✧';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    letter-spacing: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    animation: twinkle 3s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body.theme-blueberry .cats-logo-container::after {
+    content: '🌙';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    animation: moonFloat 4s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes moonFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Ночные мысли котиков */
+body.theme-blueberry .cat-thoughts {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #fef0ee !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}

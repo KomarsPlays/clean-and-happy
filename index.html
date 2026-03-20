@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Clean & Happy - Совместное приложение для планирования уборки">
+    <meta name="theme-color" content="#F4A97A">
+    <title>Clean & Happy</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/cat-girl.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/cat-girl.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Библиотека иконок Phosphor -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/icons.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css?v=32">
+</head>
+<body>
+    <!-- Конфетти-контейнер -->
+    <div id="confetti-container"></div>
+
+    <!-- Шапка -->
+    <header class="app-header">
+        <!-- Слева: Укрупненное Градиентное Кольцо (80px) -->
+        <div class="header-left">
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="80" height="80">
+                    <defs>
+                        <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#F4A97A" />
+                            <stop offset="100%" stop-color="#d65e9e" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="progress-ring-bg" cx="40" cy="40" r="34" />
+                    <circle class="progress-ring-fill" id="progressRing" cx="40" cy="40" r="34" />
+                </svg>
+                <div class="progress-inner-circle">
+                    <span class="progress-text" id="progressText">🌱</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Центр: Логотип Пользователя -->
+        <div class="header-center">
+            <div class="cats-logo-container">
+                <img src="cats_new_logo.png" alt="Clean & Happy" class="cats-logo-img">
+                <div class="cat-thoughts" id="catThoughts">Мурр-мяу! 🐾</div>
+            </div>
+        </div>
+
+        <!-- Справа: Действия и Дата -->
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="btn-sound" id="btnSound" title="Звук">
+                    <i class="ph-bold ph-speaker-high"></i>
+                </button>
+                <button class="btn-calendar" id="btnCalendar" title="Календарь">
+                    <i class="ph-bold ph-calendar-blank"></i>
+                </button>
+                <button class="btn-settings" id="btnSettings" title="Настройки">
+                    <i class="ph-bold ph-gear"></i>
+                </button>
+            </div>
+            <div class="date-badge">
+                <span class="date-num" id="dateFull"></span>
+                <span class="date-day" id="dateDay"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ежедневный чек-лист -->
+    <section class="daily-section">
+        <div class="section-header">
+            <div class="section-title-row">
+                <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                <h2>Утро</h2>
+            </div>
+        </div>
+        <ul class="task-list" id="morningTasks"></ul>
+
+        <div class="section-header evening-header">
+            <div class="section-title-row">
+                <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <h2>Вечер</h2>
+            </div>
+        </div>
+        <ul class="task-list" id="eveningTasks"></ul>
+    </section>
+
+    <!-- Зонные задачи (плитка) -->
+    <section class="zone-section">
+        <div class="section-header">
+            <div class="section-title-row">
+                <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <h2>Задачи на сегодня</h2>
+            </div>
+        </div>
+        <div class="zone-grid" id="zoneGrid"></div>
+        <!-- Кнопка досрочного выполнения -->
+        <button class="btn-extra-done" id="btnExtraDone">
+            <i class="ph-bold ph-plus-circle"></i> Сделано ещё!
+        </button>
+        <div class="extra-done-list" id="extraDoneList"></div>
+    </section>
+
+    <!-- Модальное окно настроек -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Настройки</h2>
+                <button class="btn-close" id="btnCloseSettings" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Табы настроек -->
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-tab="daily">Ежедневные</button>
+                <button class="tab-btn" data-tab="periodic">Периодические</button>
+                <button class="tab-btn" data-tab="sync">Синхронизация</button>
+            </div>
+
+            <!-- Ежедневные задачи -->
+            <div class="tab-content active" id="tabDaily">
+                <h3>Утренние задачи</h3>
+                <ul class="settings-task-list" id="settingsMorning"></ul>
+                <div class="add-task-row">
+                    <input type="text" class="input-add" id="inputMorningTask" placeholder="Новая утренняя задача...">
+                    <button class="btn-add" id="btnAddMorning">+</button>
+                </div>
+
+                <h3>Вечерние задачи</h3>
+                <ul class="settings-task-list" id="settingsEvening"></ul>
+                <div class="add-task-row">
+                    <input type="text" class="input-add" id="inputEveningTask" placeholder="Новая вечерняя задача...">
+                    <button class="btn-add" id="btnAddEvening">+</button>
+                </div>
+            </div>
+
+            <!-- Периодические задачи -->
+            <div class="tab-content" id="tabPeriodic">
+                <ul class="settings-task-list periodic-list" id="settingsPeriodic"></ul>
+                <div class="add-periodic-form" id="addPeriodicForm">
+                    <input type="text" class="input-add input-wide" id="inputPeriodicName" placeholder="Название задачи...">
+                    <div class="form-row">
+                        <label>
+                            Зоны:
+                            <div class="zone-checkboxes" id="zoneCheckboxes"></div>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            Интервал (дней):
+                            <input type="number" class="input-number" id="inputInterval" min="1" max="90" value="7">
+                        </label>
+                        <label>
+                            День недели:
+                            <select class="input-select" id="inputWeekday">
+                                <option value="">Любой</option>
+                                <option value="1">Понедельник</option>
+                                <option value="2">Вторник</option>
+                                <option value="3">Среда</option>
+                                <option value="4">Четверг</option>
+                                <option value="5">Пятница</option>
+                                <option value="6">Суббота</option>
+                                <option value="0">Воскресенье</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button class="btn-add-periodic" id="btnAddPeriodic">Добавить задачу</button>
+                </div>
+            </div>
+
+            <!-- Синхронизация Firebase -->
+            <div class="tab-content" id="tabSync">
+                <h3>Настройка Firebase</h3>
+                <div class="add-periodic-form">
+                    <input type="text" class="input-add input-wide" id="fbApiKey" placeholder="API Key">
+                    <input type="text" class="input-add input-wide" id="fbAuthDomain" placeholder="Auth Domain">
+                    <input type="text" class="input-add input-wide" id="fbProjectId" placeholder="Project ID">
+                    <input type="text" class="input-add input-wide" id="fbStorageBucket" placeholder="Storage Bucket">
+                    <input type="text" class="input-add input-wide" id="fbSenderId" placeholder="Messaging Sender ID">
+                    <input type="text" class="input-add input-wide" id="fbAppId" placeholder="App ID">
+                    <button class="btn-add-periodic" id="btnSaveFirebase" style="background: var(--primary);">Сохранить настройки</button>
+                    <p id="fbStatus" style="font-size: 0.85rem; margin-top: 8px; text-align: center; color: var(--text-light);"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно календаря -->
+    <div class="modal-overlay" id="calendarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Календарь</h2>
+                <button class="btn-close" id="btnCloseCalendar" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Переключатель неделя/месяц -->
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-cal-tab="week" id="calTabWeek">Неделя</button>
+                <button class="tab-btn" data-cal-tab="month" id="calTabMonth">Месяц</button>
+            </div>
+
+            <!-- Навигация -->
+            <div class="cal-nav">
+                <button class="cal-nav-btn" id="calPrev">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span class="cal-nav-title" id="calNavTitle"></span>
+                <button class="cal-nav-btn" id="calNext">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+            </div>
+
+            <!-- Сетка дней -->
+            <div class="cal-grid" id="calGrid"></div>
+
+            <!-- Задачи выбранного дня -->
+            <div class="cal-day-tasks" id="calDayTasks">
+                <h3 id="calDayTitle">Выберите день</h3>
+                <ul class="cal-task-list" id="calTaskList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="app.js?v=32"></script>
+    <script>
+        // Принудительно уничтожаем старый Service Worker, чтобы сбросить жесткий кэш у пользователя
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

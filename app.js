@@ -1551,10 +1551,7 @@ function applyTimeTheme() {
     const stop0 = document.querySelector('#ring-gradient stop:first-child');
     const stop1 = document.querySelector('#ring-gradient stop:last-child');
 
-    // >>> ВРЕМЕННО: принудительно дневная тема для отладки дизайна <<<
-    const FORCE_DAY_THEME = true;
-
-    if (FORCE_DAY_THEME || (hour >= 5 && hour < 19)) {
+    if (hour >= 5 && hour < 19) {
         body.classList.add('theme-day');         // 05:00 — 19:00
         if (stop0) { stop0.setAttribute('stop-color', '#F4A97A'); }
         if (stop1) { stop1.setAttribute('stop-color', '#d65e9e'); }

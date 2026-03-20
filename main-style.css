@@ -188,7 +188,21 @@ body.theme-day {
     display: flex;
     align-items: center;
     gap: 3px;
-    margin-top: 4px;
+    margin-top: 5px;
+    padding-top: 5px;
+    position: relative;
+}
+
+.info-weather::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 1.5px;
+    background: rgba(192, 102, 155, 0.35);
+    border-radius: 1px;
 }
 
 .weather-icon {

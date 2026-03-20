@@ -1753,6 +1753,7 @@ body.theme-blueberry .progress-inner-circle {
 
 body.theme-blueberry .date-badge {
     background: rgba(255, 255, 255, 0.2) !important;
+    color: #fef0ee !important;
 }
 
 body.theme-blueberry .btn-settings,
@@ -1817,9 +1818,11 @@ body.theme-blueberry .settings-task-item {
     color: #fef0ee;
 }
 
-body.theme-blueberry .settings-task-item .task-interval,
-body.theme-blueberry .settings-task-item .task-frequency {
-    color: rgba(254, 240, 238, 0.9) !important;
+body.theme-blueberry .settings-task-item .task-interval {
+    color: #3d2a35 !important;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    padding: 2px 6px;
 }
 
 body.theme-blueberry .settings-task-item span {
@@ -2208,16 +2211,14 @@ body.theme-blueberry .btn-extra-done:hover {
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 420px) {
     .app-header {
-        grid-template-columns: 60px 1fr auto;
-        gap: 8px;
+        grid-template-columns: auto 1fr auto;
+        gap: 6px;
         padding: 8px 10px 2px;
     }
 
     .progress-ring-container {
         width: 60px;
         height: 60px;
-        transform: scale(0.75);
-        transform-origin: center;
     }
 
     .cats-logo-img {

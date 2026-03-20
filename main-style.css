@@ -306,7 +306,7 @@ body.theme-blueberry .cat-thoughts {
 .progress-ring-fill {
     fill: none;
     stroke: url(#ring-gradient);
-    stroke-width: 6;
+    stroke-width: 12; /* Увеличено в 2 раза */
     stroke-linecap: round;
     transition: stroke-dashoffset 0.8s ease-out;
     transform: rotate(-90deg);
@@ -318,8 +318,8 @@ body.theme-blueberry .cat-thoughts {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 72px;
-    height: 72px;
+    width: 56px; /* Внутренний круг стал меньше для контраста с толстой рамкой */
+    height: 56px;
     border-radius: 50%;
     background: transparent; /* Невидимый по умолчанию (Капучино/Персик) */
     display: flex;

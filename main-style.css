@@ -149,7 +149,7 @@ body.theme-day {
     grid-template-columns: 1fr auto 1fr;
     align-items: flex-start;
     padding: 0 16px;
-    margin-top: 12px; /* Возвращаем отступ, так как 100px кольцо слишком большое и наезжает на иконки */
+    margin-top: 0;
     width: 100%;
 }
 

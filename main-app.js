@@ -1568,6 +1568,74 @@ function applyTimeTheme() {
     }
 }
 
+// ===== ДАТА И ПОГОДА В ШАПКЕ =====
+const WEATHER_LAT = 56.01; // Пушкино, Московская область
+const WEATHER_LON = 37.85;
+const WEATHER_CACHE_KEY = 'ch_weather_cache';
+const WEATHER_CACHE_TTL = 30 * 60 * 1000; // 30 минут
+
+function renderHeaderDate() {
+    const el = document.getElementById('headerDate');
+    if (!el) return;
+    const now = new Date();
+    // Дни недели и месяцы на русском
+    const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    el.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+}
+
+// WMO Weather Interpretation Codes -> эмодзи
+function weatherCodeToEmoji(code) {
+    if (code === 0) return '\u2600\uFE0F';         // ясно
+    if (code <= 3) return '\u26C5';                  // облачно
+    if (code <= 48) return '\uD83C\uDF2B\uFE0F';    // туман
+    if (code <= 57) return '\uD83C\uDF27\uFE0F';    // морось
+    if (code <= 67) return '\uD83C\uDF27\uFE0F';    // дождь
+    if (code <= 77) return '\u2744\uFE0F';           // снег
+    if (code <= 82) return '\uD83C\uDF26\uFE0F';    // ливень
+    if (code <= 86) return '\uD83C\uDF28\uFE0F';    // снегопад
+    if (code >= 95) return '\u26C8\uFE0F';           // гроза
+    return '\u2601\uFE0F'; // облачно по умолчанию
+}
+
+async function fetchWeather() {
+    const iconEl = document.getElementById('weatherIcon');
+    const tempEl = document.getElementById('weatherTemp');
+    if (!iconEl || !tempEl) return;
+
+    // Проверяем кэш
+    try {
+        const cached = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY));
+        if (cached && (Date.now() - cached.ts < WEATHER_CACHE_TTL)) {
+            iconEl.textContent = cached.icon;
+            tempEl.textContent = cached.temp;
+            return;
+        }
+    } catch(e) { /* кэш битый - ок, запросим заново */ }
+
+    // Запрос Open-Meteo (бесплатный, без ключа)
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LON}&current_weather=true&timezone=Europe%2FMoscow`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const cw = data.current_weather;
+        const icon = weatherCodeToEmoji(cw.weathercode);
+        const temp = `${Math.round(cw.temperature)}\u00B0`;
+
+        iconEl.textContent = icon;
+        tempEl.textContent = temp;
+
+        // Кэшируем
+        localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
+            icon, temp, ts: Date.now()
+        }));
+    } catch(e) {
+        // Офлайн или ошибка - показываем что есть в кэше или «—»
+        tempEl.textContent = '\u2014';
+    }
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 function init() {
     applyTimeTheme(); // Тема по времени суток
@@ -1588,6 +1656,8 @@ function init() {
     updateTodayStat();
     renderAll();
     updateCatThoughts();
+    renderHeaderDate();
+    fetchWeather();
 
     // Кнопка переключения звука
     const btnSound = document.getElementById('btnSound');

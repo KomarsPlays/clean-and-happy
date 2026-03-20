@@ -157,6 +157,7 @@ body.theme-day {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative; /* ВЕРНУТЬ, чтобы декорации ночного неба не улетали */
 }
 
 .cats-logo-img {
@@ -2149,15 +2150,8 @@ body.theme-blueberry .cats-logo-container::before {
 }
 
 body.theme-blueberry .cats-logo-container::after {
-    content: '🌙';
-    position: absolute;
-    top: -5px;
-    right: 15px; /* Прижимаем ближе к центру котиков */
-    font-size: 1.1rem;
-    opacity: 0.7;
-    animation: moonFloat 4s ease-in-out infinite;
-    z-index: 0;
-    pointer-events: none;
+    /* Луна убрана из чернового эскиза шапки */
+    display: none;
 }
 
 @keyframes twinkle {

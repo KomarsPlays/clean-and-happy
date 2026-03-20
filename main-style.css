@@ -145,8 +145,8 @@ body.theme-day {
 
 /* Основной блок: Логотип и кольцо */
 .header-main-content {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: flex-start; /* Поднимаем кольцо, чтобы ось 40px совпала с высотой голов из 108px картинки */
     padding: 0 16px;
     margin-top: 4px;
@@ -154,10 +154,12 @@ body.theme-day {
 }
 
 .cats-logo-container {
+    grid-column: 2; /* Строго по центру экрана */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    position: relative; /* ВЕРНУТЬ, чтобы декорации ночного неба не улетали */
+    align-items: center;
+    position: relative;
 }
 
 .cats-logo-img {
@@ -173,11 +175,12 @@ body.theme-day {
 }
 
 .progress-ring-wrapper {
+    grid-column: 3; /* Прижимается к правому краю */
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    margin-right: 8px; /* Выравнивание по X: 48px до центра 96px блока иконок минус 40px радиус кольца = 8px сдвиг влево */
-    margin-top: 4px; /* Чуть опускаем само кольцо, чтобы его центр (40+4=44px) попал точно в центр голов котиков */
+    margin-right: 8px; /* Выравнивание по X: совпадение с центром 96px блока иконок */
+    margin-top: 4px; /* Чуть опускаем само кольцо, чтобы ось Y совпала с головами */
 }
 
 .logo-ribbon {

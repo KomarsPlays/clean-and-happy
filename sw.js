@@ -1,13 +1,13 @@
-const CACHE_NAME = 'clean-happy-v4';
+const CACHE_NAME = 'clean-happy-v5';
 const ASSETS = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/firebase-config.js',
-    '/manifest.json',
-    '/assets/cat-girl.png',
-    '/assets/cat-boy.png',
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './firebase-config.js',
+    './manifest.json',
+    './assets/cat-girl.png',
+    './assets/cat-boy.png',
 ];
 
 // Install

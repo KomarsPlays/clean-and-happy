@@ -121,10 +121,10 @@ body.theme-day {
 /* ===== HEADER ===== */
 .app-header {
     display: grid;
-    grid-template-columns: 80px 1fr auto; /* Поднял до 80px под укрупненное кольцо */
+    grid-template-columns: 80px 1fr 80px; /* Три колонки, чтобы центр был точно по центру */
     align-items: center;
     gap: 12px;
-    padding: 12px 16px 2px; /* Подрезал пустоту снизу */
+    padding: 12px 16px 2px;
     background: transparent;
     position: relative;
     z-index: 100;
@@ -210,31 +210,23 @@ body.theme-day {
 
 .header-right {
     display: flex;
-    flex-direction: column;
-    align-items: stretch; /* Дата растянется по ширине иконок */
-    gap: 6px;
-    flex-shrink: 0;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: -30px; /* Поднимаем иконки наверх */
+    z-index: 9999; /* Поверх луны и звёзд */
 }
 
 .header-actions {
     display: flex;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 .date-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: var(--border);
-    color: var(--primary);
-    padding: 4px 0;
-    border-radius: 10px;
-    font-family: var(--font-title);
-    font-size: 0.75rem;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(196, 164, 216, 0.25);
-    width: 100%;
+    display: none;
 }
 
 .date-day {
@@ -246,17 +238,25 @@ body.theme-day {
 }
 
 .btn-settings, .btn-calendar, .btn-sound {
-    background: var(--border);
+    background: none;
     border: none;
-    color: #F4A97A;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px; /* Квадратик со скруглёнными углами */
+    color: var(--text-light);
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition);
+    font-size: 1.2rem; /* Одинаковый размер иконок */
+    line-height: 1;
+    opacity: 0.5;
+}
+
+.btn-settings:hover, .btn-calendar:hover, .btn-sound:hover {
+    opacity: 1;
 }
 
 .btn-settings svg, .btn-calendar svg, .btn-sound svg {
@@ -1713,7 +1713,7 @@ body.theme-blueberry {
 }
 
 body.theme-blueberry .task-item {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -1736,7 +1736,7 @@ body.theme-blueberry .task-item.completed .task-text {
 }
 
 body.theme-blueberry .zone-tile-badge {
-    color: rgba(254, 240, 238, 0.85);
+    color: rgba(0, 0, 0, 0.6) !important;
 }
 
 body.theme-blueberry .progress-ring-bg {
@@ -1752,14 +1752,14 @@ body.theme-blueberry .progress-inner-circle {
 }
 
 body.theme-blueberry .date-badge {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(60, 40, 50, 0.35) !important;
     color: #fef0ee !important;
 }
 
 body.theme-blueberry .btn-settings,
 body.theme-blueberry .btn-calendar,
 body.theme-blueberry .btn-sound {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: transparent !important;
     color: #fef0ee !important;
 }
 
@@ -1798,7 +1798,7 @@ body.theme-blueberry .settings-tabs {
 }
 
 body.theme-blueberry .tab-btn {
-    color: rgba(254, 240, 238, 0.85) !important;
+    color: rgba(254, 240, 238, 0.95) !important;
 }
 
 body.theme-blueberry .tab-btn.active {
@@ -1820,9 +1820,6 @@ body.theme-blueberry .settings-task-item {
 
 body.theme-blueberry .settings-task-item .task-interval {
     color: #3d2a35 !important;
-    background: rgba(255, 255, 255, 0.35);
-    border-radius: 6px;
-    padding: 2px 6px;
 }
 
 body.theme-blueberry .settings-task-item span {
@@ -2160,7 +2157,7 @@ body.theme-blueberry .cats-logo-container::after {
     content: '🌙';
     position: absolute;
     top: -5px;
-    right: -5px;
+    right: 15px; /* Прижимаем ближе к центру котиков */
     font-size: 1.1rem;
     opacity: 0.7;
     animation: moonFloat 4s ease-in-out infinite;

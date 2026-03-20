@@ -1,9 +1,9 @@
-const CACHE_NAME = 'clean-happy-v8';
+const CACHE_NAME = 'clean-happy-v9';
 const ASSETS = [
     './',
     './index.html',
-    './style.css',
-    './app.js',
+    './main-style.css',
+    './main-app.js',
     './firebase-config.js',
     './manifest.json',
     './assets/cat-girl.png',

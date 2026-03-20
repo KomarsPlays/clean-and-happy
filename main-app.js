@@ -1579,7 +1579,7 @@ function renderHeaderDate() {
     const subEl = document.getElementById('headerDateSub');
     if (!numEl || !subEl) return;
     const now = new Date();
-    const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+    const days = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
     const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
                     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     numEl.textContent = now.getDate();

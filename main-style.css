@@ -168,14 +168,17 @@ body.theme-day {
     font-family: var(--font-title);
     font-size: 2rem;
     font-weight: 800;
-    color: var(--text);
     line-height: 1;
     letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #F4A97A, #d65e9e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .info-date-sub {
     font-family: var(--font-body);
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-light);
     text-transform: lowercase;
@@ -191,7 +194,7 @@ body.theme-day {
 }
 
 .weather-icon {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     line-height: 1;
 }
 
@@ -199,9 +202,8 @@ body.theme-day {
     font-family: var(--font-title);
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--text);
+    color: #d65e9e;
     line-height: 1;
-    opacity: 0.9;
 }
 
 .cats-logo-container {

@@ -181,7 +181,7 @@ body.theme-day {
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text);
-    margin-top: 1px;
+    margin-top: -1px;
 }
 
 .info-weather {

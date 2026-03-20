@@ -1575,14 +1575,15 @@ const WEATHER_CACHE_KEY = 'ch_weather_cache';
 const WEATHER_CACHE_TTL = 30 * 60 * 1000; // 30 минут
 
 function renderHeaderDate() {
-    const el = document.getElementById('headerDate');
-    if (!el) return;
+    const numEl = document.getElementById('headerDateNum');
+    const subEl = document.getElementById('headerDateSub');
+    if (!numEl || !subEl) return;
     const now = new Date();
-    // Дни недели и месяцы на русском
-    const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
     const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
                     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-    el.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+    numEl.textContent = now.getDate();
+    subEl.textContent = `${months[now.getMonth()]} · ${days[now.getDay()]}`;
 }
 
 // WMO Weather Interpretation Codes -> эмодзи

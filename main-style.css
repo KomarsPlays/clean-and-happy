@@ -159,37 +159,49 @@ body.theme-day {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    padding-top: 8px;
-    gap: 2px;
+    align-items: center;
+    padding-top: 4px;
+    gap: 0;
 }
 
-.info-date {
+.info-date-num {
     font-family: var(--font-title);
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     color: var(--text);
-    line-height: 1.3;
-    opacity: 0.9;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+
+.info-date-sub {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: lowercase;
+    opacity: 0.75;
+    margin-top: 1px;
 }
 
 .info-weather {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-family: var(--font-body);
-    font-size: 0.8rem;
-    color: var(--text-light);
-    opacity: 0.85;
+    gap: 3px;
+    margin-top: 4px;
 }
 
 .weather-icon {
-    font-size: 1rem;
+    font-size: 1.1rem;
     line-height: 1;
 }
 
 .weather-temp {
-    font-weight: 600;
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    opacity: 0.9;
 }
 
 .cats-logo-container {

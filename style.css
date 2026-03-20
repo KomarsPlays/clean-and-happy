@@ -2173,6 +2173,29 @@ body.theme-blueberry .cat-thoughts {
     border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
+/* Иконки зон при выполненных задачах в Чернике */
+body.theme-blueberry .zone-tile.completed .zone-tile-icon {
+    color: rgba(254, 240, 238, 0.45) !important;
+    filter: none !important;
+}
+
+body.theme-blueberry .zone-tile.completed .zone-tile-name,
+body.theme-blueberry .zone-tile.completed .zone-tile-badge {
+    color: rgba(254, 240, 238, 0.4) !important;
+}
+
+/* Кнопка "Сделано ещё" в Чернике */
+body.theme-blueberry .btn-extra-done {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: rgba(254, 240, 238, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.theme-blueberry .btn-extra-done:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 420px) {
     .app-header {

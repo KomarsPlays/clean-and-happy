@@ -246,12 +246,12 @@
     <script src="firebase-config.js?v=42"></script>
     <script src="main-app.js?v=42"></script>
     <script>
-        // Принудительно уничтожаем старый Service Worker, чтобы сбросить жесткий кэш у пользователя
+        // Активация PWA (Service Worker)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered!', reg))
+                    .catch(err => console.error('SW failed:', err));
             });
         }
     </script>

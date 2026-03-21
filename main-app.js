@@ -575,11 +575,10 @@ function renderExtraDoneList() {
     list.innerHTML = '';
 
     const today = todayStr();
-    // Показываем задачи, которые НЕ назначены на сегодня и НЕ выполнены сегодня
+    // Показываем ВСЕ задачи, которые ещё НЕ выполнены сегодня (даже если они есть на главном экране)
     const extraTasks = state.periodicTasks.filter(t => {
-        const isDueToday = t.nextDueAt <= today;
         const isDoneToday = !!state.todayLog.periodic[t.id];
-        return !isDueToday && !isDoneToday;
+        return !isDoneToday;
     });
 
     if (extraTasks.length === 0) {

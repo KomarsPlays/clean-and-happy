@@ -889,7 +889,8 @@ body.theme-blueberry .cat-thoughts {
 }
 
 .extra-done-list.open {
-    max-height: 500px;
+    max-height: 50vh; /* Ограничиваем высоту списком до 50% экрана */
+    overflow-y: auto; /* Включаем внутреннюю прокрутку */
     margin-top: 8px;
 }
 

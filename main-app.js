@@ -279,7 +279,7 @@ function renderProgress() {
 
     // Кольцо
     const circle = document.getElementById('progressRing');
-    const circumference = 2 * Math.PI * 34; // r=34 для кольца 80px
+    const circumference = 2 * Math.PI * 42; // r=42 (обновленный размер)
     const offset = circumference - (pct / 100) * circumference;
     circle.style.strokeDasharray = circumference;
     circle.style.strokeDashoffset = offset;
@@ -1545,18 +1545,24 @@ function triggerSakura() {
 
 // ===== АВТОМАТИЧЕСКАЯ СМЕНА ТЕМЫ ПО ВРЕМЕНИ СУТОК =====
 function applyTimeTheme() {
-    // ВРЕМЕННО: Фиксируем тему Черника для эскиза
     const hour = new Date().getHours();
     const body = document.body;
     body.classList.remove('theme-day', 'theme-blueberry');
     
-    body.classList.add('theme-blueberry');   // ПРИНУДИТЕЛЬНО
-
     const stop0 = document.querySelector('#ring-gradient stop:first-child');
     const stop1 = document.querySelector('#ring-gradient stop:last-child');
-    
-    if (stop0) { stop0.setAttribute('stop-color', '#c0669b'); }
-    if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
+
+    // Дневная тема с 06:00 до 19:00 (согласно прошлым договоренностям)
+    if (hour >= 6 && hour < 19) {
+        body.classList.add('theme-day');
+        if (stop0) { stop0.setAttribute('stop-color', '#F4A97A'); }
+        if (stop1) { stop1.setAttribute('stop-color', '#d65e9e'); }
+    } else {
+        // Черника с 19:00 до 06:00
+        body.classList.add('theme-blueberry');
+        if (stop0) { stop0.setAttribute('stop-color', '#c0669b'); }
+        if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
+    }
     
     // Оставляем исходный звук, чтобы не ломать логику пользователю
     state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';

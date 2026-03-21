@@ -2264,6 +2264,12 @@ body.theme-blueberry .btn-extra-done:hover {
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 600px) {
+    /* Пропорциональное уменьшение блока даты и погоды по совету Архитектора */
+    .date-card .date-number { font-size: 2.2rem !important; }
+    .date-card .date-month-day { font-size: 0.9rem !important; }
+    .weather-widget { font-size: 1rem !important; margin-top: 2px !important; padding: 2px 8px !important; }
+    .weather-widget .weather-icon { font-size: 1.2rem !important; }
+
     /* Меньшая кольцевая диаграмма: используем CSS-scale вместо ломки атрибутов ширины */
     .progress-ring-container {
         width: 100px !important;
@@ -2287,17 +2293,7 @@ body.theme-blueberry .btn-extra-done:hover {
         font-size: 1.5rem !important;
     }
 
-    /* Котики поменьше, чтобы не распирали шапку */
-    .cats-logo-img {
-        height: 85px;
-    }
-
-    /* Иконки шапки: делаем их крупнее для удобства нажатия пальцем */
-    .btn-settings, .btn-calendar, .btn-sound {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 1.6rem !important;
-    }
+    /* Мобильные костыли для котиков и гигантских иконок удалены для возврата идеальных пропорций */
 
     /* Задачи на сегодня: строгие 2 колонки на любых экранах */
     .zone-grid {

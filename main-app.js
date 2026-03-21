@@ -739,6 +739,8 @@ function togglePeriodicTask(taskId, element) {
             save();
             updateTodayStat();
             renderAll();
+            // ВАЖНО: Вызов всплывашки для красных задач!
+            showUndoToast(task ? task.name : 'Задача выполнена!');
             return;
         }
         if (element) element.classList.add('completed');
@@ -1552,16 +1554,20 @@ function applyTimeTheme() {
     const stop0 = document.querySelector('#ring-gradient stop:first-child');
     const stop1 = document.querySelector('#ring-gradient stop:last-child');
 
+    const themeMeta = document.getElementById('themeColorMeta');
+
     // Дневная тема с 06:00 до 19:00 (согласно прошлым договоренностям)
     if (hour >= 6 && hour < 19) {
         body.classList.add('theme-day');
         if (stop0) { stop0.setAttribute('stop-color', '#F4A97A'); }
         if (stop1) { stop1.setAttribute('stop-color', '#d65e9e'); }
+        if (themeMeta) themeMeta.setAttribute('content', '#F4A97A');
     } else {
         // Черника с 19:00 до 06:00
         body.classList.add('theme-blueberry');
         if (stop0) { stop0.setAttribute('stop-color', '#c0669b'); }
         if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
+        if (themeMeta) themeMeta.setAttribute('content', '#5a466b'); /* Тёмно-черничный цвет шторки */
     }
     
     // Оставляем исходный звук, чтобы не ломать логику пользователю

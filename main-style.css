@@ -2299,9 +2299,9 @@ body.theme-blueberry .btn-extra-done:hover {
         font-size: 1.6rem !important;
     }
 
-    /* Задачи на сегодня: одна колонка вместо двух (чтобы текст не плющило в высоту) */
+    /* Задачи на сегодня: строгие 2 колонки на любых экранах */
     .zone-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     /* Вкладки в настройках: сжимаем текст и отступы, чтобы длинное слово "Синхронизация" влезло */

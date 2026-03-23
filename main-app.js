@@ -647,7 +647,7 @@ function renderMaintenanceLog() {
                 <textarea class="custom-maint-name" placeholder="Название дела" rows="1" style="resize:none; overflow:hidden;">${task.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
                     <input type="date" class="custom-maint-date" value="${task.dateStr || ''}">
-                    <span class="maintenance-date" style="margin-left:auto">${daysPassed !== null ? 'Дней: <span style="font-weight:bold">'+daysPassed+'</span>' : ''}</span>
+                    <span class="maintenance-date" style="margin-left:auto">${daysPassed !== null ? 'Прошло дней: <span style="font-weight:bold">'+daysPassed+'</span>' : ''}</span>
                     <button class="btn-delete-task" style="margin-left: 8px;" data-id="${task.id}" aria-label="Delete">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>

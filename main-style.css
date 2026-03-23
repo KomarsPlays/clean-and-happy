@@ -2392,8 +2392,8 @@ body.theme-blueberry .maintenance-btn {
     color: var(--text);
 }
 .custom-maintenance input[type="date"] {
-    width: auto;
-    max-width: 140px;
+    flex: 0 0 130px;
+    width: 130px;
     margin-right: 12px;
     font-size: 0.9rem;
 }

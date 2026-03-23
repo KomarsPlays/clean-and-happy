@@ -111,7 +111,7 @@ body {
     background: linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 100%); /* По умолчанию: День */
     color: var(--text);
     min-height: 100dvh;
-    padding-bottom: 40px;
+    padding-bottom: 80px; /* Увеличено с 40px, чтобы нижние кнопки ("Сделано еще") не перекрывались на смартфонах */
     overflow-x: hidden;
     transition: background 1.2s ease, color 0.8s ease; /* Плавная смена тем */
 }
@@ -1885,7 +1885,7 @@ body.theme-blueberry .tab-content h3 {
 /* Элементы списка задач в настройках */
 body.theme-blueberry .settings-task-item {
     background: rgba(255, 255, 255, 0.25) !important;
-    color: #fef0ee;
+    color: #3d2a35 !important;
 }
 
 body.theme-blueberry .settings-task-item .task-interval {
@@ -1893,7 +1893,7 @@ body.theme-blueberry .settings-task-item .task-interval {
 }
 
 body.theme-blueberry .settings-task-item span {
-    color: #fef0ee !important;
+    color: #3d2a35 !important;
 }
 
 /* Поля ввода */

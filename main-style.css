@@ -2019,8 +2019,15 @@ body.theme-blueberry .cal-task-list .cal-task-item {
 /* Иконки и SVG в шапке */
 body.theme-blueberry .btn-settings svg,
 body.theme-blueberry .btn-calendar svg,
-body.theme-blueberry .btn-sound svg {
+body.theme-blueberry .btn-sound svg,
+body.theme-blueberry .btn-log svg {
     stroke: #fef0ee !important;
+}
+body.theme-blueberry .btn-settings i,
+body.theme-blueberry .btn-calendar i,
+body.theme-blueberry .btn-sound i,
+body.theme-blueberry .btn-log i {
+    color: #fef0ee !important;
 }
 
 /* Секция прогресса — звёздочки */
@@ -2095,13 +2102,15 @@ body.theme-day .btn-sound {
 
 body.theme-day .btn-settings i,
 body.theme-day .btn-calendar i,
-body.theme-day .btn-sound i {
+body.theme-day .btn-sound i,
+body.theme-day .btn-log i {
     color: #F4A97A !important;
 }
 
 body.theme-day .btn-settings svg,
 body.theme-day .btn-calendar svg,
-body.theme-day .btn-sound svg {
+body.theme-day .btn-sound svg,
+body.theme-day .btn-log svg {
     stroke: #F4A97A !important;
 }
 
@@ -2371,4 +2380,28 @@ body.theme-blueberry .maintenance-item {
 body.theme-blueberry .maintenance-btn {
     background: rgba(255, 255, 255, 0.2);
     color: #fef0ee;
+}
+.custom-maintenance input[type="text"], .custom-maintenance input[type="date"] {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: rgba(255,255,255,0.8);
+    color: var(--text-main);
+}
+.custom-maint-name {
+    font-weight: 600;
+}
+body.theme-blueberry .custom-maintenance input {
+    color: #3d2a35 !important;
+    background: rgba(255,255,255,0.7);
+    border: none;
+}
+body.theme-blueberry .maintenance-date,
+body.theme-blueberry .maintenance-info span,
+body.theme-blueberry .btn-delete-task svg {
+    color: #3d2a35 !important;
+    stroke: #3d2a35 !important;
 }

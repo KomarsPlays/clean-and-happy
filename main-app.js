@@ -51,21 +51,14 @@ const DEFAULT_PERIODIC_TASKS = [
     { id: 'p24', name: 'Обеспыливание: подоконник',                             zones: ['room'],     intervalDays: 14, fixedWeekday: null },
 ];
 
-const MAINTENANCE_TASKS = [
-    { id: 'drain', name: 'Очистка стоков (сифоны)', intervalDays: 30 },
-    { id: 'washing_machine', name: 'Прогон стиральной машины (очистка)', intervalDays: 60 },
-    { id: 'dishwasher', name: 'Очистка посудомойки (фильтр)', intervalDays: 30 },
-    { id: 'coffee', name: 'Декальцинация кофемашины', intervalDays: 60 },
-    { id: 'hood', name: 'Мытье фильтра вытяжки', intervalDays: 90 },
-    { id: 'mattress', name: 'Перевернуть / пропылесосить матрас', intervalDays: 180 },
-];
+
 
 // ===== СОСТОЯНИЕ ПРИЛОЖЕНИЯ =====
 let state = {
     dailyTasks: { morning: [], evening: [] },
     periodicTasks: [],
     todayLog: { daily: {}, periodic: {} }, // {taskId: completedTimestamp}
-    maintenanceLog: {} // {taskId: "YYYY-MM-DD"}
+    customMaintenance: [] // [{id, name, dateStr}]
 };
 
 // ===== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ =====
@@ -74,7 +67,7 @@ const STORAGE_KEYS = {
     periodic: 'ch_periodic_tasks',
     log: 'ch_today_log',
     logDate: 'ch_log_date',
-    maintenance: 'ch_maintenance_log',
+    customMaint: 'ch_custom_maintenance',
 };
 
 function saveToLocal() {
@@ -82,7 +75,7 @@ function saveToLocal() {
     localStorage.setItem(STORAGE_KEYS.periodic, JSON.stringify(state.periodicTasks));
     localStorage.setItem(STORAGE_KEYS.log, JSON.stringify(state.todayLog));
     localStorage.setItem(STORAGE_KEYS.logDate, todayStr());
-    localStorage.setItem(STORAGE_KEYS.maintenance, JSON.stringify(state.maintenanceLog));
+    localStorage.setItem(STORAGE_KEYS.customMaint, JSON.stringify(state.customMaintenance));
 }
 
 function loadFromLocal() {
@@ -122,10 +115,16 @@ function loadFromLocal() {
     }
 
     // Подгружаем Журнал
-    state.maintenanceLog = JSON.parse(localStorage.getItem(STORAGE_KEYS.maintenance) || '{}');
+    state.customMaintenance = JSON.parse(localStorage.getItem(STORAGE_KEYS.customMaint) || '[]');
 
-    // Состояние звука
-    state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';
+    // Состояние звука - днем включен, ночью выключен по умолчанию
+    const savedSound = localStorage.getItem('ch_sound');
+    if (savedSound !== null) {
+        state.soundEnabled = savedSound === 'true';
+    } else {
+        const hour = new Date().getHours();
+        state.soundEnabled = (hour >= 6 && hour < 19);
+    }
 
     // Подгружаем статистику истории
     state.historyStat = JSON.parse(localStorage.getItem('ch_history_stat') || '{}');
@@ -144,7 +143,7 @@ function initFirebaseSync() {
                 const data = doc.data();
                 if (data.dailyTasks) state.dailyTasks = data.dailyTasks;
                 if (data.periodicTasks) state.periodicTasks = data.periodicTasks;
-                if (data.maintenanceLog) state.maintenanceLog = data.maintenanceLog;
+                if (data.customMaintenance) state.customMaintenance = data.customMaintenance;
                 renderAll();
                 if (typeof renderMaintenanceLog === 'function') renderMaintenanceLog();
             }
@@ -168,7 +167,7 @@ function saveToFirebase() {
     db.collection('clean-happy').doc('config').set({
         dailyTasks: state.dailyTasks,
         periodicTasks: state.periodicTasks,
-        maintenanceLog: state.maintenanceLog,
+        customMaintenance: state.customMaintenance,
     }, { merge: true });
 
     db.collection('clean-happy').doc('log-' + todayStr()).set(
@@ -184,11 +183,18 @@ function save() {
 
 // ===== УТИЛИТЫ =====
 function todayStr() {
-    return new Date().toISOString().split('T')[0];
+    const d = new Date();
+    d.setHours(d.getHours() - 5);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
 }
 
 function todayDate() {
-    return new Date();
+    const d = new Date();
+    d.setHours(d.getHours() - 5);
+    return d;
 }
 
 function formatDate(date) {
@@ -622,45 +628,101 @@ function renderMaintenanceLog() {
     if (!list) return;
     list.innerHTML = '';
     const today = new Date();
+    today.setHours(today.getHours() - 5);
+    today.setHours(0,0,0,0);
 
-    MAINTENANCE_TASKS.forEach(task => {
-        const lastDateStr = state.maintenanceLog[task.id];
+    if (!state.customMaintenance) state.customMaintenance = [];
+
+    // Существующие задачи
+    state.customMaintenance.forEach(task => {
         let daysPassed = null;
-        let isUrgent = false;
-
-        if (lastDateStr) {
-            const lastDate = new Date(lastDateStr);
-            const diffTime = today - lastDate;
-            daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            if (daysPassed >= task.intervalDays) isUrgent = true;
+        if (task.dateStr) {
+            const taskDate = new Date(task.dateStr);
+            taskDate.setHours(0,0,0,0);
+            daysPassed = Math.floor((today - taskDate) / (1000 * 60 * 60 * 24));
         }
 
         const li = document.createElement('li');
-        li.className = 'maintenance-item';
-        
-        let textDays = daysPassed === null ? 'Никогда' : `Прошло: <span class="${isUrgent ? 'urgent' : ''}">${daysPassed} дн.</span> / ${task.intervalDays}`;
+        li.className = 'maintenance-item custom-maintenance';
         
         li.innerHTML = `
-            <div class="maintenance-info">
-                <div class="maintenance-name">${task.name}</div>
-                <div class="maintenance-date">${textDays}</div>
+            <div class="maintenance-info" style="width: 100%; gap: 8px;">
+                <input type="text" class="custom-maint-name" value="${task.name.replace(/"/g, '&quot;')}" placeholder="Название дела">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                    <input type="date" class="custom-maint-date" value="${task.dateStr || ''}">
+                    <span class="maintenance-date" style="margin-left:auto">${daysPassed !== null ? 'Дней: <span style="font-weight:bold">'+daysPassed+'</span>' : ''}</span>
+                    <button class="btn-delete-task" style="margin-left: 8px;" data-id="${task.id}" aria-label="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
             </div>
-            <button class="maintenance-btn" data-id="${task.id}">
-                Сделано
-            </button>
         `;
 
-        li.querySelector('.maintenance-btn').addEventListener('click', () => {
-            state.maintenanceLog[task.id] = todayStr();
+        const nameInput = li.querySelector('.custom-maint-name');
+        const dateInput = li.querySelector('.custom-maint-date');
+        const delBtn = li.querySelector('.btn-delete-task');
+
+        const applyChange = () => {
+            const newName = nameInput.value.trim();
+            const newDate = dateInput.value;
+            if (newName !== task.name || newDate !== task.dateStr) {
+                if (newName === '') {
+                    state.customMaintenance = state.customMaintenance.filter(t => t.id !== task.id);
+                } else {
+                    task.name = newName;
+                    task.dateStr = newDate;
+                }
+                save();
+                renderMaintenanceLog();
+            }
+        };
+
+        nameInput.addEventListener('blur', applyChange);
+        dateInput.addEventListener('change', applyChange);
+        nameInput.addEventListener('keydown', (e) => { if(e.key==='Enter') nameInput.blur(); });
+
+        delBtn.addEventListener('click', () => {
+            state.customMaintenance = state.customMaintenance.filter(t => t.id !== task.id);
             save();
             renderMaintenanceLog();
-            setTimeout(() => spawnConfetti(), 100);
-            triggerCatReaction();
-            SoundController.playPop();
         });
 
         list.appendChild(li);
     });
+
+    // Пустая строка в конце для добавления новой
+    const emptyLi = document.createElement('li');
+    emptyLi.className = 'maintenance-item custom-maintenance empty-row';
+    emptyLi.innerHTML = `
+        <div class="maintenance-info" style="width: 100%; gap: 8px;">
+            <input type="text" class="custom-maint-name" placeholder="Добавить новое дело..." style="background: transparent; border: 1px dashed rgba(0,0,0,0.2);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                <input type="date" class="custom-maint-date" value="${todayStr()}">
+            </div>
+        </div>
+    `;
+
+    const newNameInput = emptyLi.querySelector('.custom-maint-name');
+    const newDateInput = emptyLi.querySelector('.custom-maint-date');
+
+    const handleAdd = () => {
+        const title = newNameInput.value.trim();
+        if (title) {
+            state.customMaintenance.push({
+                id: generateId(),
+                name: title,
+                dateStr: newDateInput.value
+            });
+            save();
+            renderMaintenanceLog();
+            setTimeout(() => spawnConfetti(), 50);
+        }
+    };
+
+    newNameInput.addEventListener('blur', handleAdd);
+    newNameInput.addEventListener('keydown', (e) => { if(e.key==='Enter') newNameInput.blur(); });
+
+    list.appendChild(emptyLi);
 }
 
 // ===== КНОПКА "СДЕЛАЛА ЕЩЁ" =====
@@ -1681,8 +1743,7 @@ function applyTimeTheme() {
         if (themeMeta) themeMeta.setAttribute('content', '#5a466b'); /* Тёмно-черничный цвет шторки */
     }
     
-    // Оставляем исходный звук, чтобы не ломать логику пользователю
-    state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';
+    // Оставляем исходный звук, чтобы не ломать логику пользователю (УДАЛЕНО)
 
     // Обновить иконку динамика
     const btnSound = document.getElementById('btnSound');

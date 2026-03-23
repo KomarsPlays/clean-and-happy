@@ -111,7 +111,7 @@ body {
     background: linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 100%); /* По умолчанию: День */
     color: var(--text);
     min-height: 100dvh;
-    padding-bottom: 80px; /* Увеличено с 40px, чтобы нижние кнопки ("Сделано еще") не перекрывались на смартфонах */
+    padding-bottom: 60px; /* Увеличено с 40px, но меньше 80px, чтобы подвал не был слишком огромным */
     overflow-x: hidden;
     transition: background 1.2s ease, color 0.8s ease; /* Плавная смена тем */
 }
@@ -2346,12 +2346,12 @@ body.theme-blueberry .postpone-submit:active {
 }
 .maintenance-name {
     font-weight: 600;
-    color: var(--text-main);
+    color: var(--text);
     font-size: 1rem;
 }
 .maintenance-date {
     font-size: 0.85rem;
-    color: var(--text-sub);
+    color: var(--text-light);
     margin-top: 4px;
 }
 .maintenance-date span.urgent {
@@ -2359,8 +2359,8 @@ body.theme-blueberry .postpone-submit:active {
     font-weight: 600;
 }
 .maintenance-btn {
-    background: var(--bg-page);
-    color: var(--text-main);
+    background: var(--bg);
+    color: var(--text);
     border: none;
     border-radius: var(--radius-sm);
     padding: 10px 14px;
@@ -2389,7 +2389,7 @@ body.theme-blueberry .maintenance-btn {
     font-size: 1rem;
     font-family: inherit;
     background: rgba(255,255,255,0.8);
-    color: var(--text-main);
+    color: var(--text);
 }
 .custom-maint-name {
     font-weight: 600;

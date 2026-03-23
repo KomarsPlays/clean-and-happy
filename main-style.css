@@ -307,7 +307,7 @@ body.theme-blueberry .cat-thoughts {
     opacity: 0.9;
 }
 
-.btn-settings, .btn-calendar, .btn-sound {
+.btn-settings, .btn-calendar, .btn-sound, .btn-log {
     background: transparent !important;
     border: none !important;
     outline: none !important;
@@ -329,9 +329,9 @@ body.theme-blueberry .cat-thoughts {
     opacity: 0.8;
 }
 
-.btn-settings:hover, .btn-calendar:hover, .btn-sound:hover,
-.btn-settings:focus, .btn-calendar:focus, .btn-sound:focus,
-.btn-settings:active, .btn-calendar:active, .btn-sound:active {
+.btn-settings:hover, .btn-calendar:hover, .btn-sound:hover, .btn-log:hover,
+.btn-settings:focus, .btn-calendar:focus, .btn-sound:focus, .btn-log:focus,
+.btn-settings:active, .btn-calendar:active, .btn-sound:active, .btn-log:active {
     opacity: 1;
     background: transparent !important;
     border: none !important;
@@ -2032,9 +2032,9 @@ body.theme-blueberry .section-header h2::after {
 body.theme-day .cats-logo-container::after {
     content: '☀️';
     position: absolute;
-    top: -5px;
-    right: -5px;
-    font-size: 1.1rem;
+    top: -10px;
+    right: -15px;
+    font-size: 1.4rem;
     opacity: 0.7;
     animation: sunPulse 3s ease-in-out infinite;
     z-index: 0;
@@ -2044,12 +2044,12 @@ body.theme-day .cats-logo-container::after {
 body.theme-day .cats-logo-container::before {
     content: '☁️ ✦ ☁️';
     position: absolute;
-    top: -8px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.5rem;
+    font-size: 1.1rem;
     letter-spacing: 10px;
-    color: rgba(229, 197, 26, 0.4);
+    color: rgba(229, 197, 26, 0.6);
     animation: twinkle 4s ease-in-out infinite;
     z-index: 0;
     pointer-events: none;
@@ -2319,4 +2319,56 @@ body.theme-blueberry .postpone-submit:active {
         padding: 8px 2px;
         letter-spacing: -0.3px;
     }
+}
+
+/* ===== СТИЛИ ЖУРНАЛА РЕДКИХ ДЕЛ ===== */
+.maintenance-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+.maintenance-info {
+    display: flex;
+    flex-direction: column;
+}
+.maintenance-name {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+.maintenance-date {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    margin-top: 4px;
+}
+.maintenance-date span.urgent {
+    color: #ef726c; /* Coral (коралловый как для просроченных) */
+    font-weight: 600;
+}
+.maintenance-btn {
+    background: var(--bg-page);
+    color: var(--text-main);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.maintenance-btn:active {
+    transform: scale(0.95);
+    background: var(--star-color);
+}
+body.theme-blueberry .maintenance-item {
+    background: rgba(255, 255, 255, 0.1);
+}
+body.theme-blueberry .maintenance-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fef0ee;
 }

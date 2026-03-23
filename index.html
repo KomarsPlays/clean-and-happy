@@ -32,6 +32,9 @@
                 <button class="btn-calendar" id="btnCalendar" title="Календарь">
                     <i class="ph-bold ph-calendar-blank"></i>
                 </button>
+                <button class="btn-log" id="btnLog" title="Журнал редких дел">
+                    <i class="ph-bold ph-notebook"></i>
+                </button>
                 <button class="btn-settings" id="btnSettings" title="Настройки">
                     <i class="ph-bold ph-gear"></i>
                 </button>
@@ -235,6 +238,22 @@
             <div class="cal-day-tasks" id="calDayTasks">
                 <h3 id="calDayTitle">Выберите день</h3>
                 <ul class="cal-task-list" id="calTaskList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Журнал редких дел -->
+    <div class="modal-overlay" id="maintenanceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Журнал</h2>
+                <button class="modal-close" id="maintenanceClose"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="maintenance-body" style="padding: 0 20px 20px 20px;">
+                <div style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; text-align: center;">Отслеживание редких задач по дому</div>
+                <ul class="maintenance-list" id="maintenanceList" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Рендер через JS -->
+                </ul>
             </div>
         </div>
     </div>

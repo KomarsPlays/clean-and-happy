@@ -51,11 +51,21 @@ const DEFAULT_PERIODIC_TASKS = [
     { id: 'p24', name: 'Обеспыливание: подоконник',                             zones: ['room'],     intervalDays: 14, fixedWeekday: null },
 ];
 
+const MAINTENANCE_TASKS = [
+    { id: 'drain', name: 'Очистка стоков (сифоны)', intervalDays: 30 },
+    { id: 'washing_machine', name: 'Прогон стиральной машины (очистка)', intervalDays: 60 },
+    { id: 'dishwasher', name: 'Очистка посудомойки (фильтр)', intervalDays: 30 },
+    { id: 'coffee', name: 'Декальцинация кофемашины', intervalDays: 60 },
+    { id: 'hood', name: 'Мытье фильтра вытяжки', intervalDays: 90 },
+    { id: 'mattress', name: 'Перевернуть / пропылесосить матрас', intervalDays: 180 },
+];
+
 // ===== СОСТОЯНИЕ ПРИЛОЖЕНИЯ =====
 let state = {
     dailyTasks: { morning: [], evening: [] },
     periodicTasks: [],
     todayLog: { daily: {}, periodic: {} }, // {taskId: completedTimestamp}
+    maintenanceLog: {} // {taskId: "YYYY-MM-DD"}
 };
 
 // ===== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ =====
@@ -64,6 +74,7 @@ const STORAGE_KEYS = {
     periodic: 'ch_periodic_tasks',
     log: 'ch_today_log',
     logDate: 'ch_log_date',
+    maintenance: 'ch_maintenance_log',
 };
 
 function saveToLocal() {
@@ -71,6 +82,7 @@ function saveToLocal() {
     localStorage.setItem(STORAGE_KEYS.periodic, JSON.stringify(state.periodicTasks));
     localStorage.setItem(STORAGE_KEYS.log, JSON.stringify(state.todayLog));
     localStorage.setItem(STORAGE_KEYS.logDate, todayStr());
+    localStorage.setItem(STORAGE_KEYS.maintenance, JSON.stringify(state.maintenanceLog));
 }
 
 function loadFromLocal() {
@@ -109,6 +121,9 @@ function loadFromLocal() {
         state.todayLog = { daily: {}, periodic: {} };
     }
 
+    // Подгружаем Журнал
+    state.maintenanceLog = JSON.parse(localStorage.getItem(STORAGE_KEYS.maintenance) || '{}');
+
     // Состояние звука
     state.soundEnabled = localStorage.getItem('ch_sound') !== 'false';
 
@@ -129,7 +144,9 @@ function initFirebaseSync() {
                 const data = doc.data();
                 if (data.dailyTasks) state.dailyTasks = data.dailyTasks;
                 if (data.periodicTasks) state.periodicTasks = data.periodicTasks;
+                if (data.maintenanceLog) state.maintenanceLog = data.maintenanceLog;
                 renderAll();
+                if (typeof renderMaintenanceLog === 'function') renderMaintenanceLog();
             }
         });
 
@@ -151,6 +168,7 @@ function saveToFirebase() {
     db.collection('clean-happy').doc('config').set({
         dailyTasks: state.dailyTasks,
         periodicTasks: state.periodicTasks,
+        maintenanceLog: state.maintenanceLog,
     }, { merge: true });
 
     db.collection('clean-happy').doc('log-' + todayStr()).set(
@@ -417,9 +435,17 @@ function renderZoneTiles() {
         // Long-press for postpone popup, click for toggle
         let pressTimer = null;
         let isLongPress = false;
+        let startY = 0;
+        let startX = 0;
+        let isSwiping = false;
 
         const startPress = (e) => {
             isLongPress = false;
+            isSwiping = false;
+            if (e.touches && e.touches.length > 0) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
             pressTimer = setTimeout(() => {
                 isLongPress = true;
                 showPostponePopup(task, tile);
@@ -428,19 +454,39 @@ function renderZoneTiles() {
 
         const endPress = (e) => {
             clearTimeout(pressTimer);
-            if (!isLongPress) {
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                if (Math.abs(endX - startX) > 10 || Math.abs(endY - startY) > 10) {
+                    isSwiping = true;
+                }
+            }
+            if (!isLongPress && !isSwiping) {
                 togglePeriodicTask(task.id, tile);
             }
         };
 
-        const cancelPress = () => { clearTimeout(pressTimer); };
+        const cancelPress = () => { 
+            clearTimeout(pressTimer);
+            // We do not set isSwiping = true here indiscriminately, 
+            // because on some browsers touchmove fires for 1px jitter.
+            // Distance is calculated on touchend.
+        };
 
         tile.addEventListener('mousedown', startPress);
         tile.addEventListener('mouseup', endPress);
         tile.addEventListener('mouseleave', cancelPress);
         tile.addEventListener('touchstart', startPress, { passive: true });
-        tile.addEventListener('touchend', (e) => { e.preventDefault(); endPress(e); });
-        tile.addEventListener('touchmove', cancelPress);
+        
+        // e.cancelable проверка нужна, чтобы не блокировать скролл, если preventDefault нельзя сделать
+        tile.addEventListener('touchend', (e) => { 
+            if (e.cancelable && !isSwiping && !isLongPress) {
+                // Только если это реальный клик (не скролл), предотвращаем default (чтобы не было double fire).
+                // Но лучше вообще не делать preventDefault() здесь, чтобы не ломать нативный скролл!
+            }
+            endPress(e); 
+        });
+        tile.addEventListener('touchmove', cancelPress, { passive: true });
 
         grid.appendChild(tile);
     });
@@ -549,6 +595,72 @@ function hideUndoToast() {
         toast.classList.remove('visible');
         setTimeout(() => toast.remove(), 400);
     }
+}
+// ===== ЖУРНАЛ РЕДКИХ ДЕЛ =====
+function initMaintenanceLog() {
+    const modal = document.getElementById('maintenanceModal');
+    const btnOpen = document.getElementById('btnLog');
+    const btnClose = document.getElementById('maintenanceClose');
+    if (!modal || !btnOpen || !btnClose) return;
+
+    btnOpen.addEventListener('click', () => {
+        modal.classList.add('open');
+        renderMaintenanceLog();
+    });
+
+    btnClose.addEventListener('click', () => {
+        modal.classList.remove('open');
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('open');
+    });
+}
+
+function renderMaintenanceLog() {
+    const list = document.getElementById('maintenanceList');
+    if (!list) return;
+    list.innerHTML = '';
+    const today = new Date();
+
+    MAINTENANCE_TASKS.forEach(task => {
+        const lastDateStr = state.maintenanceLog[task.id];
+        let daysPassed = null;
+        let isUrgent = false;
+
+        if (lastDateStr) {
+            const lastDate = new Date(lastDateStr);
+            const diffTime = today - lastDate;
+            daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            if (daysPassed >= task.intervalDays) isUrgent = true;
+        }
+
+        const li = document.createElement('li');
+        li.className = 'maintenance-item';
+        
+        let textDays = daysPassed === null ? 'Никогда' : `Прошло: <span class="${isUrgent ? 'urgent' : ''}">${daysPassed} дн.</span> / ${task.intervalDays}`;
+        
+        li.innerHTML = `
+            <div class="maintenance-info">
+                <div class="maintenance-name">${task.name}</div>
+                <div class="maintenance-date">${textDays}</div>
+            </div>
+            <button class="maintenance-btn" data-id="${task.id}">
+                Сделано
+            </button>
+        `;
+
+        li.querySelector('.maintenance-btn').addEventListener('click', () => {
+            state.maintenanceLog[task.id] = todayStr();
+            save();
+            renderMaintenanceLog();
+            setTimeout(() => spawnConfetti(), 100);
+            triggerCatReaction();
+            SoundController.playPop();
+        });
+
+        list.appendChild(li);
+    });
 }
 
 // ===== КНОПКА "СДЕЛАЛА ЕЩЁ" =====
@@ -1685,6 +1797,7 @@ function init() {
 
     initSettingsModal();
     initCalendar();
+    if (typeof initMaintenanceLog === 'function') initMaintenanceLog();
     initExtraDone();
     initFirebaseSync();
 }

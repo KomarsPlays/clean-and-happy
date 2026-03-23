@@ -1,0 +1,20 @@
+L119: // ===== FIREBASE SYNC =====
+L122: function initFirebaseSync() {
+L123:     if (!useFirebase || !db) return;
+L148: function saveToFirebase() {
+L149:     if (!useFirebase || !db) return;
+L164:     saveToFirebase();
+L849:         loadFirebaseSettingsToUI(); // Подгружаем ключи в поля ввода
+L886:     // Сохранение настроек Firebase
+L887:     const btnSaveFB = document.getElementById('btnSaveFirebase');
+L889:         btnSaveFB.addEventListener('click', saveFirebaseSettings);
+L893: // ===== НАСТРОЙКИ: FIREBASE =====
+L894: function loadFirebaseSettingsToUI() {
+L895:     const saved = localStorage.getItem('ch_firebase_config');
+L908:     if (useFirebase) {
+L909:         statusEl.innerHTML = '<span style="color: #10B981;">🟢 Подключено к Firebase</span>';
+L911:         statusEl.innerHTML = '<span style="color: #F59E0B;">🟠 Ключи не сохранены или пустые (Firebase выключен)</span>';
+L915: function saveFirebaseSettings() {
+L930:     localStorage.setItem('ch_firebase_config', JSON.stringify(config));
+L1642: async function fetchWeather() {
+L1717:     initFirebaseSync();

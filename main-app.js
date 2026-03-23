@@ -192,9 +192,7 @@ function todayStr() {
 }
 
 function todayDate() {
-    const d = new Date();
-    d.setHours(d.getHours() - 5);
-    return d;
+    return new Date();
 }
 
 function formatDate(date) {
@@ -628,7 +626,6 @@ function renderMaintenanceLog() {
     if (!list) return;
     list.innerHTML = '';
     const today = new Date();
-    today.setHours(today.getHours() - 5);
     today.setHours(0,0,0,0);
 
     if (!state.customMaintenance) state.customMaintenance = [];

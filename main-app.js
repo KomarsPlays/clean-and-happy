@@ -644,7 +644,7 @@ function renderMaintenanceLog() {
         
         li.innerHTML = `
             <div class="maintenance-info" style="width: 100%; gap: 8px;">
-                <input type="text" class="custom-maint-name" value="${task.name.replace(/"/g, '&quot;')}" placeholder="Название дела">
+                <textarea class="custom-maint-name" placeholder="Название дела" rows="1" style="resize:none; overflow:hidden;">${task.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
                     <input type="date" class="custom-maint-date" value="${task.dateStr || ''}">
                     <span class="maintenance-date" style="margin-left:auto">${daysPassed !== null ? 'Дней: <span style="font-weight:bold">'+daysPassed+'</span>' : ''}</span>
@@ -658,6 +658,10 @@ function renderMaintenanceLog() {
         const nameInput = li.querySelector('.custom-maint-name');
         const dateInput = li.querySelector('.custom-maint-date');
         const delBtn = li.querySelector('.btn-delete-task');
+        
+        const autoResize = () => { nameInput.style.height = 'auto'; nameInput.style.height = nameInput.scrollHeight + 'px'; };
+        nameInput.addEventListener('input', autoResize);
+        setTimeout(autoResize, 0);
 
         const applyChange = () => {
             const newName = nameInput.value.trim();
@@ -676,7 +680,12 @@ function renderMaintenanceLog() {
 
         nameInput.addEventListener('blur', applyChange);
         dateInput.addEventListener('change', applyChange);
-        nameInput.addEventListener('keydown', (e) => { if(e.key==='Enter') nameInput.blur(); });
+        nameInput.addEventListener('keydown', (e) => { 
+            if(e.key === 'Enter') { 
+                e.preventDefault(); 
+                nameInput.blur(); 
+            } 
+        });
 
         delBtn.addEventListener('click', () => {
             state.customMaintenance = state.customMaintenance.filter(t => t.id !== task.id);
@@ -692,7 +701,7 @@ function renderMaintenanceLog() {
     emptyLi.className = 'maintenance-item custom-maintenance empty-row';
     emptyLi.innerHTML = `
         <div class="maintenance-info" style="width: 100%; gap: 8px;">
-            <input type="text" class="custom-maint-name" placeholder="Добавить новое дело..." style="background: transparent; border: 1px dashed rgba(0,0,0,0.2);">
+            <textarea class="custom-maint-name" placeholder="Добавить новое дело..." rows="1" style="resize:none; overflow:hidden; background: transparent; border: 1px dashed rgba(0,0,0,0.2);"></textarea>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
                 <input type="date" class="custom-maint-date" value="${todayStr()}">
             </div>
@@ -701,6 +710,8 @@ function renderMaintenanceLog() {
 
     const newNameInput = emptyLi.querySelector('.custom-maint-name');
     const newDateInput = emptyLi.querySelector('.custom-maint-date');
+    const newAutoResize = () => { newNameInput.style.height = 'auto'; newNameInput.style.height = newNameInput.scrollHeight + 'px'; };
+    newNameInput.addEventListener('input', newAutoResize);
 
     const handleAdd = () => {
         const title = newNameInput.value.trim();
@@ -717,7 +728,12 @@ function renderMaintenanceLog() {
     };
 
     newNameInput.addEventListener('blur', handleAdd);
-    newNameInput.addEventListener('keydown', (e) => { if(e.key==='Enter') newNameInput.blur(); });
+    newNameInput.addEventListener('keydown', (e) => { 
+        if(e.key === 'Enter') {
+            e.preventDefault(); 
+            newNameInput.blur(); 
+        } 
+    });
 
     list.appendChild(emptyLi);
 }

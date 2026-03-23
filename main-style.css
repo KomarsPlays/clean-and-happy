@@ -2381,7 +2381,7 @@ body.theme-blueberry .maintenance-btn {
     background: rgba(255, 255, 255, 0.2);
     color: #fef0ee;
 }
-.custom-maintenance input[type="text"], .custom-maintenance input[type="date"] {
+.custom-maintenance textarea, .custom-maintenance input[type="date"] {
     width: 100%;
     padding: 6px;
     border: 1px solid rgba(0,0,0,0.1);
@@ -2394,7 +2394,8 @@ body.theme-blueberry .maintenance-btn {
 .custom-maint-name {
     font-weight: 600;
 }
-body.theme-blueberry .custom-maintenance input {
+body.theme-blueberry .custom-maintenance input,
+body.theme-blueberry .custom-maintenance textarea {
     color: #3d2a35 !important;
     background: rgba(255,255,255,0.7);
     border: none;

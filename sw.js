@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clean-happy-v29';
+const CACHE_NAME = 'clean-happy-v45';
 const ASSETS = [
     './',
     './index.html',

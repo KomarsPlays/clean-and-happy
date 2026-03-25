@@ -171,8 +171,7 @@ function saveToFirebase() {
     }, { merge: true });
 
     db.collection('clean-happy').doc('log-' + todayStr()).set(
-        state.todayLog,
-        { merge: true }
+        state.todayLog
     );
 }
 
@@ -436,61 +435,40 @@ function renderZoneTiles() {
             ${overdueBadge}
         `;
 
-        // Long-press for postpone popup, click for toggle
         let pressTimer = null;
         let isLongPress = false;
         let startY = 0;
         let startX = 0;
         let isSwiping = false;
 
-        const startPress = (e) => {
+        tile.addEventListener('pointerdown', (e) => {
             isLongPress = false;
             isSwiping = false;
-            if (e.touches && e.touches.length > 0) {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            }
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            // Если пошел скролл, pointercancel отменит таймаут
             pressTimer = setTimeout(() => {
                 isLongPress = true;
                 showPostponePopup(task, tile);
             }, 700);
-        };
+        });
 
-        const endPress = (e) => {
+        tile.addEventListener('pointerup', (e) => {
+            console.log('POINTER_UP fired on tile', task.id);
             clearTimeout(pressTimer);
-            if (e.changedTouches && e.changedTouches.length > 0) {
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                if (Math.abs(endX - startX) > 10 || Math.abs(endY - startY) > 10) {
-                    isSwiping = true;
-                }
+            if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+                isSwiping = true;
             }
+            console.log('isSwiping:', isSwiping, 'isLongPress:', isLongPress);
             if (!isLongPress && !isSwiping) {
+                console.log('Calling togglePeriodicTask for', task.id);
                 togglePeriodicTask(task.id, tile);
             }
-        };
-
-        const cancelPress = () => { 
-            clearTimeout(pressTimer);
-            // We do not set isSwiping = true here indiscriminately, 
-            // because on some browsers touchmove fires for 1px jitter.
-            // Distance is calculated on touchend.
-        };
-
-        tile.addEventListener('mousedown', startPress);
-        tile.addEventListener('mouseup', endPress);
-        tile.addEventListener('mouseleave', cancelPress);
-        tile.addEventListener('touchstart', startPress, { passive: true });
-        
-        // e.cancelable проверка нужна, чтобы не блокировать скролл, если preventDefault нельзя сделать
-        tile.addEventListener('touchend', (e) => { 
-            if (e.cancelable && !isSwiping && !isLongPress) {
-                // Только если это реальный клик (не скролл), предотвращаем default (чтобы не было double fire).
-                // Но лучше вообще не делать preventDefault() здесь, чтобы не ломать нативный скролл!
-            }
-            endPress(e); 
         });
-        tile.addEventListener('touchmove', cancelPress, { passive: true });
+
+        tile.addEventListener('pointercancel', () => clearTimeout(pressTimer));
+        tile.addEventListener('pointerleave', () => clearTimeout(pressTimer));
 
         grid.appendChild(tile);
     });

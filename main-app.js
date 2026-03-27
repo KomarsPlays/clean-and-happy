@@ -472,6 +472,21 @@ function renderZoneTiles() {
 
         grid.appendChild(tile);
     });
+
+    // Управление видимостью кнопки прощения долгов
+    const btnForgive = document.getElementById('btnForgiveOverdue');
+    if (btnForgive) {
+        const hasOverdue = tasks.some(t => {
+            const isCompleted = !!state.todayLog.periodic[t.id];
+            return !isCompleted && t.nextDueAt < today;
+        });
+        btnForgive.style.display = hasOverdue ? 'flex' : 'none';
+        
+        // Отвязываем старые обработчики во избежание множения кликов
+        const newBtnForgive = btnForgive.cloneNode(true);
+        btnForgive.parentNode.replaceChild(newBtnForgive, btnForgive);
+        newBtnForgive.addEventListener('click', forgiveOverdueTasks);
+    }
 }
 
 // ===== POPUP "POSTPONE" =====
@@ -577,6 +592,62 @@ function hideUndoToast() {
         toast.classList.remove('visible');
         setTimeout(() => toast.remove(), 400);
     }
+}
+
+// ===== ПРОЩЕНИЕ ДОЛГОВ (ВОЛШЕБНАЯ ПАЛОЧКА С БАЛАНСИРОВКОЙ) =====
+function forgiveOverdueTasks() {
+    saveSnapshot('Сброс долгов');
+    const today = todayStr();
+    const todayDateObj = new Date();
+    todayDateObj.setHours(0,0,0,0);
+    
+    let overdueTasks = [];
+    
+    // 1. Инициализируем карту загрузки на ближайшие 7 дней (сегодня + 6 дней)
+    let loadByDay = {};
+    for (let i = 0; i < 7; i++) {
+        let d = new Date(todayDateObj.getTime() + i * 24 * 60 * 60 * 1000);
+        let dateStr = d.toISOString().split('T')[0];
+        // Если это сегодня, учитываем сдвиг часового пояса в todayStr
+        if (i === 0) dateStr = today; 
+        else loadByDay[dateStr] = 0;
+    }
+    loadByDay[today] = 0;
+
+    // 2. Считаем текущую загрузку будущих дней и собираем долги
+    state.periodicTasks.forEach(task => {
+        const isCompleted = !!(state.todayLog.periodic && state.todayLog.periodic[task.id]);
+        
+        if (!isCompleted && task.nextDueAt < today) {
+            overdueTasks.push(task); // Это долг
+        } else if (loadByDay[task.nextDueAt] !== undefined && !isCompleted) {
+            loadByDay[task.nextDueAt]++; // Это запланированная таска
+        }
+    });
+
+    if (overdueTasks.length === 0) return;
+
+    // 3. Распределяем долги по самым свободным дням
+    overdueTasks.forEach(task => {
+        // Ищем день с минимальной нагрузкой
+        let minDay = today;
+        let minLoad = Infinity;
+
+        for (const [dateStr, load] of Object.entries(loadByDay)) {
+            if (load < minLoad) {
+                minLoad = load;
+                minDay = dateStr;
+            }
+        }
+
+        task.nextDueAt = minDay;
+        loadByDay[minDay]++; // Увеличиваем нагрузку на выбранный день
+    });
+
+    save();
+    renderAll();
+    triggerSakura(); // Психологическое поощрение
+    showUndoToast(`✨ Долги распределены по балансу (${overdueTasks.length} шт.)`);
 }
 // ===== ЖУРНАЛ РЕДКИХ ДЕЛ =====
 function initMaintenanceLog() {
@@ -1746,7 +1817,7 @@ function applyTimeTheme() {
 // ===== ДАТА И ПОГОДА В ШАПКЕ =====
 const WEATHER_LAT = 56.01; // Пушкино, Московская область
 const WEATHER_LON = 37.85;
-const WEATHER_CACHE_KEY = 'ch_weather_cache';
+const WEATHER_CACHE_KEY = 'ch_weather_cache_v2';
 const WEATHER_CACHE_TTL = 30 * 60 * 1000; // 30 минут
 
 function renderHeaderDate() {

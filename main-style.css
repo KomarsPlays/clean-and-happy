@@ -2413,7 +2413,8 @@ body.theme-blueberry .btn-delete-task svg {
     stroke: #3d2a35 !important;
 }
 
+
 /* Кнопка сброса долгов (Волшебная палочка) */
-.btn-forgive { display: flex; align-items: center; gap: 6px; background: var(--surface); color: var(--primary); border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin-left: auto; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.btn-forgive:active { transform: scale(0.95); background: var(--primary); color: white; }
-.btn-forgive i { font-size: 1.1rem; }
+.btn-forgive { background: transparent !important; border: none !important; outline: none !important; color: var(--text-light); width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition); font-size: 1.3rem; opacity: 0.8; margin-left: auto; }
+.btn-forgive:hover { opacity: 1; transform: scale(1.1); }
+.btn-forgive i { font-size: 1.4rem; }

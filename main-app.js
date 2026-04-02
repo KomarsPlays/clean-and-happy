@@ -196,8 +196,8 @@ function todayDate() {
 
 function formatDate(date) {
     const days = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
-    const months = ['янв.', 'февр.', 'марта', 'апр.', 'мая', 'июня',
-                    'июля', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'];
+    const months = ['янв', 'февр', 'марта', 'апр', 'мая', 'июня',
+                    'июля', 'авг', 'сент', 'окт', 'нояб', 'дек'];
     return {
         day: days[date.getDay()],
         full: `${date.getDate()} ${months[date.getMonth()]}`,
@@ -1826,8 +1826,8 @@ function renderHeaderDate() {
     if (!numEl || !subEl) return;
     const now = new Date();
     const days = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
-    const months = ['янв.', 'февр.', 'марта', 'апр.', 'мая', 'июня',
-                    'июля', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'];
+    const months = ['янв', 'февр', 'марта', 'апр', 'мая', 'июня',
+                    'июля', 'авг', 'сент', 'окт', 'нояб', 'дек'];
     numEl.textContent = now.getDate();
     subEl.textContent = `${months[now.getMonth()]} · ${days[now.getDay()]}`;
 }

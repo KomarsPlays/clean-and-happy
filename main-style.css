@@ -2041,7 +2041,7 @@ body.theme-day .cats-logo-container::after {
     position: absolute;
     top: -15px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 35px));
     font-size: 1.6rem;
     opacity: 0.85;
     animation: sunPulse 3s ease-in-out infinite;

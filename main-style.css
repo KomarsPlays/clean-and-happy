@@ -2039,9 +2039,9 @@ body.theme-blueberry .section-header h2::after {
 body.theme-day .cats-logo-container::after {
     content: '☀️';
     position: absolute;
-    top: -15px;
+    top: -16px;
     left: 50%;
-    margin-left: -40px; /* Отцентровано + визуальный сдвиг влево между котиками */
+    margin-left: -15px; /* Идеальный центр: половина от 30px */
     font-size: 1.6rem;
     opacity: 0.85;
     animation: sunPulse 3s ease-in-out infinite;

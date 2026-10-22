@@ -41,7 +41,8 @@ const DEFAULT_PERIODIC_TASKS = [
     { id: 'p15', name: 'Протереть сидушку унитаза спирт. салфеткой',           zones: ['bathroom'], intervalDays: 2,  fixedWeekday: null },
     { id: 'p16', name: 'Постирать коврик',                                     zones: ['bathroom'], intervalDays: 14, fixedWeekday: 6 },
     { id: 'p17', name: 'Протереть зеркало и полочку',                          zones: ['bathroom'], intervalDays: 7,  fixedWeekday: null },
-    { id: 'p18', name: 'Постирать полотенца, повесить другие',                 zones: ['bathroom'], intervalDays: 14, fixedWeekday: null },
+    { id: 'p25', name: 'Повесить чистые банные полотенца',                     zones: ['bathroom'], intervalDays: 10, fixedWeekday: null },
+    { id: 'p26', name: 'Повесить чистые полотенца для рук',                    zones: ['bathroom'], intervalDays: 5,  fixedWeekday: null },
     // -- Комната --
     { id: 'p19', name: 'Поменять постельное белье + постирать',                zones: ['room'],     intervalDays: 14, fixedWeekday: null },
     { id: 'p20', name: 'Обеспыливание: Сашин стол',                            zones: ['room'],     intervalDays: 14, fixedWeekday: null },
@@ -256,7 +257,7 @@ function initializePeriodicTasks() {
         4: ['p10', 'p22', 'p23', 'p05'], // Четверг
         5: ['p04', 'p11', 'p12', 'p24'], // Пятница
         6: ['p06', 'p08', 'p07', 'p16'], // Суббота
-        0: ['p19', 'p18'], // Воскресенье
+        0: ['p19', 'p25', 'p26'], // Воскресенье
     };
 
     // Найти ближайший день недели для каждой задачи
@@ -1916,6 +1917,26 @@ function init() {
             save();
         }
         localStorage.setItem('ch_migrated_fridge', '1');
+    }
+
+    // === ОДНОРАЗОВАЯ МИГРАЦИЯ: полотенца -> банные (10 дн.) и для рук (5 дн.), 23.10.2026 ===
+    if (!localStorage.getItem('ch_migrated_towels')) {
+        const old = state.periodicTasks.find(t => t.id === 'p18');
+        state.periodicTasks = state.periodicTasks.filter(t => t.id !== 'p18');
+        delete state.todayLog.periodic['p18'];
+        const has = id => state.periodicTasks.some(t => t.id === id);
+        if (!has('p25')) state.periodicTasks.push({
+            id: 'p25', name: 'Повесить чистые банные полотенца', zones: ['bathroom'],
+            intervalDays: 10, fixedWeekday: null,
+            nextDueAt: (old && old.nextDueAt) || todayStr(), lastCompletedAt: null,
+        });
+        if (!has('p26')) state.periodicTasks.push({
+            id: 'p26', name: 'Повесить чистые полотенца для рук', zones: ['bathroom'],
+            intervalDays: 5, fixedWeekday: null,
+            nextDueAt: todayStr(), lastCompletedAt: null,
+        });
+        save();
+        localStorage.setItem('ch_migrated_towels', '1');
     }
 
     updateTodayStat();

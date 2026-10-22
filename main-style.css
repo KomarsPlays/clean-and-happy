@@ -1897,18 +1897,18 @@ body.theme-blueberry .settings-task-item span {
 }
 
 /* Поля ввода */
+/* Окно настроек ночью светло-розовое, поэтому текст в полях тёмный, как у списка задач */
 body.theme-blueberry .input-add,
 body.theme-blueberry .input-number,
 body.theme-blueberry .input-select {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    color: #fef0ee !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    color: #3d2a35 !important;
 }
 
 body.theme-blueberry .input-add::placeholder {
-    color: rgba(254, 240, 238, 0.4) !important;
+    color: rgba(61, 42, 53, 0.5) !important;
 }
-
 /* Кнопки */
 body.theme-blueberry .btn-add {
     background: #c0669b !important;
@@ -1920,9 +1920,9 @@ body.theme-blueberry .btn-add-periodic {
     color: #fef0ee !important;
 }
 
-/* Лейблы форм */
+/* Лейблы форм: форма добавления светлая, поэтому текст тёмный */
 body.theme-blueberry .form-row label {
-    color: rgba(254, 240, 238, 0.8) !important;
+    color: #3d2a35 !important;
 }
 
 /* Календарь: навигация */

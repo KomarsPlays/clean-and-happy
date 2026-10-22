@@ -181,13 +181,48 @@ function save() {
 }
 
 // ===== УТИЛИТЫ =====
+// День в приложении начинается в 5 утра
 function todayStr() {
     const d = new Date();
     d.setHours(d.getHours() - 5);
+    return dateToStr(d);
+}
+
+// Даты считаем по местному времени. toISOString() не годится:
+// он даёт дату по Гринвичу, и в Москве до 3 ночи она на день раньше
+function dateToStr(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+}
+
+function strToDate(s) {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
+}
+
+function addDaysStr(s, n) {
+    const d = strToDate(s);
+    d.setDate(d.getDate() + n);
+    return dateToStr(d);
+}
+
+// Подвинуть дату к ближайшему нужному дню недели (не дальше 3 дней в любую сторону)
+function snapToWeekday(s, weekday) {
+    if (weekday === null || weekday === undefined) return s;
+    const d = strToDate(s);
+    let diff = (weekday - d.getDay() + 7) % 7;
+    if (diff > 3) diff -= 7;
+    d.setDate(d.getDate() + diff);
+    return dateToStr(d);
+}
+
+// Следующий срок задачи, считая от даты выполнения
+function nextDueFrom(task, fromStr) {
+    let next = snapToWeekday(addDaysStr(fromStr, task.intervalDays), task.fixedWeekday);
+    while (next <= fromStr) next = addDaysStr(next, 7);
+    return next;
 }
 
 function todayDate() {
@@ -210,7 +245,7 @@ function generateId() {
 
 // ===== ИНИЦИАЛИЗАЦИЯ ПЕРИОДИЧЕСКИХ ЗАДАЧ =====
 function initializePeriodicTasks() {
-    const today = todayDate();
+    const today = strToDate(todayStr());
     const tasks = JSON.parse(JSON.stringify(DEFAULT_PERIODIC_TASKS));
 
     // Стартовое распределение
@@ -244,7 +279,7 @@ function initializePeriodicTasks() {
 
             const nextDate = new Date(today);
             nextDate.setDate(nextDate.getDate() + daysUntil);
-            task.nextDueAt = nextDate.toISOString().split('T')[0];
+            task.nextDueAt = dateToStr(nextDate);
         } else {
             // Показать сразу
             task.nextDueAt = todayStr();
@@ -455,14 +490,11 @@ function renderZoneTiles() {
         });
 
         tile.addEventListener('pointerup', (e) => {
-            console.log('POINTER_UP fired on tile', task.id);
             clearTimeout(pressTimer);
             if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
                 isSwiping = true;
             }
-            console.log('isSwiping:', isSwiping, 'isLongPress:', isLongPress);
             if (!isLongPress && !isSwiping) {
-                console.log('Calling togglePeriodicTask for', task.id);
                 togglePeriodicTask(task.id, tile);
             }
         });
@@ -539,9 +571,7 @@ function postponeTask(taskId, days) {
 
     saveSnapshot(`\u041f\u0435\u0440\u0435\u0434\u0432\u0438\u043d\u0443\u0442\u043e: ${task.name}`);
 
-    const next = new Date();
-    next.setDate(next.getDate() + days);
-    task.nextDueAt = next.toISOString().split('T')[0];
+    task.nextDueAt = addDaysStr(todayStr(), days);
 
     save();
     updateTodayStat();
@@ -598,21 +628,14 @@ function hideUndoToast() {
 function forgiveOverdueTasks() {
     saveSnapshot('Сброс долгов');
     const today = todayStr();
-    const todayDateObj = new Date();
-    todayDateObj.setHours(0,0,0,0);
-    
+
     let overdueTasks = [];
-    
+
     // 1. Инициализируем карту загрузки на ближайшие 7 дней (сегодня + 6 дней)
     let loadByDay = {};
     for (let i = 0; i < 7; i++) {
-        let d = new Date(todayDateObj.getTime() + i * 24 * 60 * 60 * 1000);
-        let dateStr = d.toISOString().split('T')[0];
-        // Если это сегодня, учитываем сдвиг часового пояса в todayStr
-        if (i === 0) dateStr = today; 
-        else loadByDay[dateStr] = 0;
+        loadByDay[addDaysStr(today, i)] = 0;
     }
-    loadByDay[today] = 0;
 
     // 2. Считаем текущую загрузку будущих дней и собираем долги
     state.periodicTasks.forEach(task => {
@@ -855,9 +878,7 @@ function completeExtraTask(taskId) {
 
     // Shift nextDueAt forward from today
     task.lastCompletedAt = todayStr();
-    const next = new Date();
-    next.setDate(next.getDate() + task.intervalDays);
-    task.nextDueAt = next.toISOString().split('T')[0];
+    task.nextDueAt = nextDueFrom(task, todayStr());
 
     save();
     updateTodayStat();
@@ -960,9 +981,7 @@ function togglePeriodicTask(taskId, element) {
         state.todayLog.periodic[taskId] = { time: Date.now(), wasOverdue: wasOverdue };
         if (task) {
             task.lastCompletedAt = todayStr();
-            const next = new Date();
-            next.setDate(next.getDate() + task.intervalDays);
-            task.nextDueAt = next.toISOString().split('T')[0];
+            task.nextDueAt = nextDueFrom(task, todayStr());
         }
         // Overdue: full re-render to hide tile
         if (wasOverdue) {
@@ -1291,9 +1310,7 @@ function renderSettingsPeriodicList() {
                     task.intervalDays = newVal;
                     // Recalculate nextDueAt from lastCompletedAt
                     if (task.lastCompletedAt) {
-                        const last = new Date(task.lastCompletedAt);
-                        last.setDate(last.getDate() + newVal);
-                        task.nextDueAt = last.toISOString().split('T')[0];
+                        task.nextDueAt = nextDueFrom(task, task.lastCompletedAt);
                     }
                     save();
                     renderAll();
@@ -1408,7 +1425,7 @@ function initCalendar() {
     const btnClose = document.getElementById('btnCloseCalendar');
 
     btnOpen.addEventListener('click', () => {
-        calendarState.baseDate = new Date();
+        calendarState.baseDate = strToDate(todayStr());
         calendarState.selectedDate = null;
         modal.classList.add('open');
         renderCalendar();
@@ -1466,22 +1483,11 @@ function initCalendar() {
 function getPeriodicTasksForDate(dateStr) {
     return state.periodicTasks.filter(t => {
         if (!t.nextDueAt) return false;
-        // Задача попадает в дату если nextDueAt <= dateStr
-        // Но нам нужно показать задачи, которые будут именно в этот день
-        // Для этого эмулируем: задача с intervalDays, стартующая от nextDueAt
-        const nextDue = new Date(t.nextDueAt + 'T00:00:00');
-        const checkDate = new Date(dateStr + 'T00:00:00');
-
-        if (checkDate < nextDue) return false;
-
-        // Проверяем fixedWeekday
-        if (t.fixedWeekday !== null && t.fixedWeekday !== undefined) {
-            return checkDate.getDay() === t.fixedWeekday;
-        }
-
-        // Задача попадает на checkDate если разница дней кратна intervalDays
-        const diffDays = Math.round((checkDate - nextDue) / (1000 * 60 * 60 * 24));
-        return diffDays % t.intervalDays === 0;
+        // Проигрываем расписание вперёд от ближайшего срока так же,
+        // как его считает отметка «выполнено»
+        let d = t.nextDueAt;
+        while (d < dateStr) d = nextDueFrom(t, d);
+        return d === dateStr;
     });
 }
 
@@ -1521,7 +1527,7 @@ function renderCalendar() {
         for (let i = 0; i < 7; i++) {
             const d = new Date(monday);
             d.setDate(monday.getDate() + i);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = dateToStr(d);
             const tasks = getPeriodicTasksForDate(dateStr);
 
             const el = document.createElement('div');
@@ -1578,7 +1584,7 @@ function renderCalendar() {
         // Дни месяца
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const d = new Date(base.getFullYear(), base.getMonth(), day);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = dateToStr(d);
             const tasks = getPeriodicTasksForDate(dateStr);
 
             const el = document.createElement('div');
@@ -1884,11 +1890,23 @@ async function fetchWeather() {
 }
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
+// Телефон держит приложение спящим в фоне, и утром оно просыпается со вчерашним днём.
+// Если день сменился — перезагружаемся: loadFromLocal сам сбросит галочки.
+let loadedDay = null;
+
+function checkDayChange() {
+    if (loadedDay && todayStr() !== loadedDay) location.reload();
+}
+
 function init() {
     applyTimeTheme(); // Тема по времени суток
-    setInterval(applyTimeTheme, 60000); // Проверять каждую минуту
+    setInterval(() => { applyTimeTheme(); checkDayChange(); }, 60000); // Проверять каждую минуту
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) checkDayChange();
+    });
 
     loadFromLocal();
+    loadedDay = todayStr();
 
     // === ОДНОРАЗОВАЯ МИГРАЦИЯ: холодильник -> кухня ===
     if (!localStorage.getItem('ch_migrated_fridge')) {

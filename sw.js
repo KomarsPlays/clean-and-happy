@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clean-happy-v59';
+const CACHE_NAME = 'clean-happy-v60';
 const ASSETS = [
     './',
     './index.html',
@@ -7,7 +7,6 @@ const ASSETS = [
     './firebase-config.js',
     './manifest.json',
     './assets/cat-girl.png',
-    './assets/cat-boy.png',
 ];
 
 // Install

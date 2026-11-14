@@ -15,7 +15,7 @@
     <!-- Библиотека иконок Phosphor -->
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/icons.css">
     <!-- CSS -->
-    <link rel="stylesheet" href="main-style.css?v=65">
+    <link rel="stylesheet" href="main-style.css?v=66">
 </head>
 <body>
     <!-- Конфетти-контейнер -->
@@ -31,12 +31,6 @@
                 </button>
                 <button class="btn-calendar" id="btnCalendar" title="Календарь">
                     <i class="ph-bold ph-calendar-blank"></i>
-                </button>
-                <button class="btn-history" id="btnHistory" title="История">
-                    <i class="ph-bold ph-clock-counter-clockwise"></i>
-                </button>
-                <button class="btn-log" id="btnLog" title="Журнал редких дел">
-                    <i class="ph-bold ph-notebook"></i>
                 </button>
                 <button class="btn-settings" id="btnSettings" title="Настройки">
                     <i class="ph-bold ph-gear"></i>
@@ -204,12 +198,17 @@
     <div class="modal-overlay" id="calendarModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Календарь</h2>
+                <div class="journal-switch" role="tablist">
+                    <button class="journal-tab active" type="button" data-journal-tab="calendar">Календарь</button>
+                    <button class="journal-tab" type="button" data-journal-tab="history">История</button>
+                    <button class="journal-tab" type="button" data-journal-tab="log">Журнал</button>
+                </div>
                 <button class="btn-close" id="btnCloseCalendar" aria-label="Close">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
+            <div class="journal-pane active" data-journal-pane="calendar">
             <!-- Переключатель неделя/месяц -->
             <div class="settings-tabs">
                 <button class="tab-btn active" data-cal-tab="week" id="calTabWeek">Неделя</button>
@@ -235,31 +234,20 @@
                 <h3 id="calDayTitle">Выберите день</h3>
                 <ul class="cal-task-list" id="calTaskList"></ul>
             </div>
-        </div>
-    </div>
-
-    <!-- История выполнения -->
-    <div class="modal-overlay" id="historyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>История</h2>
-                <button class="modal-close" id="historyClose"><i class="ph-bold ph-x"></i></button>
             </div>
-            <ul class="history-list" id="historyList"></ul>
-        </div>
-    </div>
 
-    <!-- Журнал редких дел -->
-    <div class="modal-overlay" id="maintenanceModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Журнал</h2>
-                <button class="modal-close" id="maintenanceClose"><i class="ph-bold ph-x"></i></button>
+            <!-- История выполнения -->
+            <div class="journal-pane" data-journal-pane="history">
+                <ul class="history-list" id="historyList"></ul>
             </div>
-            <div class="maintenance-body" style="padding: 0 20px 20px 20px; padding-top: 10px;">
+
+            <!-- Журнал редких дел -->
+            <div class="journal-pane" data-journal-pane="log">
+            <div class="maintenance-body" style="padding-top: 4px;">
                 <ul class="maintenance-list" id="maintenanceList" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
                     <!-- Рендер через JS -->
                 </ul>
+            </div>
             </div>
         </div>
     </div>
@@ -268,8 +256,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=65"></script>
-    <script src="main-app.js?v=65"></script>
+    <script src="firebase-config.js?v=66"></script>
+    <script src="main-app.js?v=66"></script>
     <script>
         // ЖЕСТКОЕ ОТКЛЮЧЕНИЕ PWA-КЭША ДЛЯ ОТЛАДКИ (ПО ПРАВИЛАМ DASHBOARD.MD)
         if ('serviceWorker' in navigator) {

@@ -2474,8 +2474,8 @@ body.theme-blueberry .btn-history i { color: #fef0ee !important; }
     background: rgba(255, 255, 255, 0.5);
     transform: scale(0.9);
 }
-/* Восклицательный знак просрочки — левее кнопки */
-.zone-tile .overdue-badge { right: 44px; top: 12px; }
+
+
 /* Название не залезает под кнопку */
 .zone-tile .zone-tile-icon { padding-right: 34px; }
 
@@ -2595,3 +2595,41 @@ body.theme-blueberry .history-ago { color: #6e5866 !important; }
 body.theme-blueberry .history-group-title { color: #fef0ee; }
 /* На отмеченной плитке откладывать нечего */
 .zone-tile.completed .zone-tile-postpone { display: none; }
+
+/* ===== 14.11.2026: КАЛЕНДАРЬ · ИСТОРИЯ · ЖУРНАЛ В ОДНОМ ОКНЕ ===== */
+.journal-switch {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+.journal-tab {
+    border: none;
+    background: none;
+    padding: 4px 0;
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--transition), border-color var(--transition);
+}
+.journal-tab.active {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    border-bottom-color: var(--primary);
+}
+.journal-pane { display: none; }
+.journal-pane.active { display: block; }
+
+body.theme-blueberry .journal-tab { color: rgba(254, 240, 238, 0.65) !important; }
+body.theme-blueberry .journal-tab.active {
+    color: #fef0ee !important;
+    border-bottom-color: #fef0ee;
+}
+/* Окно не прыгает по высоте при смене вкладок */
+#calendarModal .modal-content { min-height: 78dvh; }

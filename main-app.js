@@ -304,8 +304,7 @@ function importHistoryFromFirebaseLogs() {
         });
         if (mergeHistory(found)) save();
         localStorage.setItem('ch_history_fb_imported', '1');
-        const modal = document.getElementById('historyModal');
-        if (modal && modal.classList.contains('open')) renderHistory();
+        if (currentJournalTab === 'history') renderHistory();
     }).catch(e => console.warn('Импорт истории из Firebase не удался:', e));
 }
 
@@ -539,10 +538,7 @@ function renderZoneTiles() {
 
         const icons = task.zones.map(z => ZONES[z]?.icon || '').join(' ');
 
-        // Бейдж просрочки
-        const overdueBadge = isOverdue
-            ? '<div class="overdue-badge">!</div>'
-            : '';
+        // Восклицательный знак просрочки убран 14.11.2026: красной заливки достаточно
 
         tile.innerHTML = `
             <div class="zone-tile-icon">${icons}</div>
@@ -552,7 +548,6 @@ function renderZoneTiles() {
             <div class="zone-checkmark">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            ${overdueBadge}
         `;
 
         // Касание плитки — «сделано». Отложить — только кнопкой с часами.
@@ -735,25 +730,8 @@ function forgiveOverdueTasks() {
     showUndoToast(`✨ Долги распределены по балансу (${overdueTasks.length} шт.)`);
 }
 // ===== ЖУРНАЛ РЕДКИХ ДЕЛ =====
-function initMaintenanceLog() {
-    const modal = document.getElementById('maintenanceModal');
-    const btnOpen = document.getElementById('btnLog');
-    const btnClose = document.getElementById('maintenanceClose');
-    if (!modal || !btnOpen || !btnClose) return;
-
-    btnOpen.addEventListener('click', () => {
-        modal.classList.add('open');
-        renderMaintenanceLog();
-    });
-
-    btnClose.addEventListener('click', () => {
-        modal.classList.remove('open');
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('open');
-    });
-}
+// Журнал открывается вкладкой в окне календаря (14.11.2026)
+function initMaintenanceLog() {}
 
 function renderMaintenanceLog() {
     const list = document.getElementById('maintenanceList');
@@ -1489,7 +1467,13 @@ function initCalendar() {
         calendarState.baseDate = strToDate(todayStr());
         calendarState.selectedDate = null;
         modal.classList.add('open');
-        renderCalendar();
+        let saved = null;
+        try { saved = localStorage.getItem('ch_journal_tab'); } catch (e) {}
+        switchJournalTab(['calendar', 'history', 'log'].includes(saved) ? saved : 'calendar');
+    });
+
+    modal.querySelectorAll('.journal-tab').forEach(btn => {
+        btn.addEventListener('click', () => switchJournalTab(btn.dataset.journalTab));
     });
 
     btnClose.addEventListener('click', () => {
@@ -1784,22 +1768,24 @@ function shortDateText(dateStr) {
     return `${day}, ${full}`;
 }
 
-function initHistory() {
-    const modal = document.getElementById('historyModal');
-    const btnOpen = document.getElementById('btnHistory');
-    const btnClose = document.getElementById('historyClose');
-    if (!modal || !btnOpen || !btnClose) return;
+// Календарь, История и Журнал — три вкладки одного окна (14.11.2026)
+let currentJournalTab = null;
 
-    btnOpen.addEventListener('click', () => {
-        modal.classList.add('open');
-        renderHistory();
-        importHistoryFromFirebaseLogs();
-    });
-    btnClose.addEventListener('click', () => modal.classList.remove('open'));
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('open');
-    });
+function switchJournalTab(name) {
+    currentJournalTab = name;
+    try { localStorage.setItem('ch_journal_tab', name); } catch (e) {}
+    document.querySelectorAll('.journal-tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.journalTab === name));
+    document.querySelectorAll('.journal-pane').forEach(p =>
+        p.classList.toggle('active', p.dataset.journalPane === name));
+    if (name === 'calendar') renderCalendar();
+    if (name === 'history') { renderHistory(); importHistoryFromFirebaseLogs(); }
+    if (name === 'log') renderMaintenanceLog();
+    const content = document.querySelector('#calendarModal .modal-content');
+    if (content) content.scrollTop = 0;
 }
+
+function initHistory() {}
 
 function renderHistory() {
     const list = document.getElementById('historyList');

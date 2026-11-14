@@ -2409,3 +2409,189 @@ body.theme-blueberry .btn-delete-task svg {
 body.theme-blueberry .btn-forgive { color: rgba(255, 255, 255, 0.9) !important; }
 .btn-forgive:hover { transform: translateY(-50%) scale(1.1); }
 .btn-forgive i { font-size: 1.4rem; }
+
+/* ===== 14.11.2026: КНОПКА «ИСТОРИЯ» В ШАПКЕ ===== */
+.btn-history {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    color: var(--text-light);
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 1.2rem;
+    line-height: 1;
+    opacity: 0.8;
+}
+.btn-history:hover, .btn-history:focus, .btn-history:active {
+    opacity: 1;
+    transform: scale(1.05);
+}
+body.theme-day .btn-history i { color: #F4A97A !important; }
+body.theme-blueberry .btn-history i { color: #fef0ee !important; }
+
+/* ===== 14.11.2026: ПЛИТКИ — БЕЗ ВЫДЕЛЕНИЯ ТЕКСТА, КНОПКА «ОТЛОЖИТЬ» ===== */
+.zone-tile {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+/* Декоративная звёздочка в углу уступает место кнопке */
+.zone-tile:not(.completed)::after { display: none; }
+
+.zone-tile-postpone {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 4;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.zone-tile-postpone:active {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(0.9);
+}
+/* Восклицательный знак просрочки — левее кнопки */
+.zone-tile .overdue-badge { right: 44px; top: 12px; }
+/* Название не залезает под кнопку */
+.zone-tile .zone-tile-icon { padding-right: 34px; }
+
+/* Окошко «Отложить на» */
+.postpone-popup .postpone-label { display: block; }
+.postpone-chips {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 10px 0 6px;
+}
+.postpone-chip {
+    min-width: 52px;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    font-family: var(--font-title);
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+.postpone-chip:active { transform: scale(0.92); background: var(--primary-dark); }
+body.theme-blueberry .postpone-chip { background: #6b5580; }
+body.theme-blueberry .postpone-chip:active { background: #806998; }
+
+/* ===== 14.11.2026: ЭКРАН «ИСТОРИЯ» ===== */
+.history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.history-group-title {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--zone-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.history-group-title::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--zone-color);
+}
+.history-tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.history-task details {
+    background: var(--bg);
+    border-left: 4px solid var(--zone-color);
+    border-radius: 10px;
+}
+.history-task summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    -webkit-tap-highlight-color: transparent;
+}
+.history-task summary::-webkit-details-marker { display: none; }
+.history-task details.empty summary { cursor: default; }
+.history-task-name {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.25;
+}
+.history-task-last {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+.history-task-last b { color: var(--text); }
+.history-dates {
+    list-style: none;
+    margin: 0;
+    padding: 0 12px 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.history-dates li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--text);
+    padding-top: 4px;
+    border-top: 1px dashed var(--border);
+}
+.history-ago { color: var(--text-muted); }
+
+body.theme-blueberry .history-task details { background: rgba(255, 255, 255, 0.7); }
+body.theme-blueberry .history-task-name,
+body.theme-blueberry .history-task-last b,
+body.theme-blueberry .history-dates li { color: #3d2a35 !important; }
+body.theme-blueberry .history-task-last,
+body.theme-blueberry .history-ago { color: #6e5866 !important; }
+body.theme-blueberry .history-group-title { color: #fef0ee; }
+/* На отмеченной плитке откладывать нечего */
+.zone-tile.completed .zone-tile-postpone { display: none; }

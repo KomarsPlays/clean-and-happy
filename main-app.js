@@ -28,9 +28,9 @@ const DEFAULT_PERIODIC_TASKS = [
     { id: 'p04', name: 'Протереть с уксусом кухонный фартук',                 zones: ['kitchen'],  intervalDays: 14, fixedWeekday: null },
     { id: 'p05', name: 'Постирать кухонную микрофибру',                        zones: ['kitchen'],  intervalDays: 10, fixedWeekday: null },
     // -- Все зоны --
-    { id: 'p06', name: 'Пропылесосить квартиру',                              zones: ['kitchen','room','bathroom','hallway'], intervalDays: 7,  fixedWeekday: 6 },
-    { id: 'p07', name: 'Пропылесосить внутри дивана и диван',                  zones: ['room'],     intervalDays: 14, fixedWeekday: 6 },
-    { id: 'p08', name: 'Помыть полы',                                          zones: ['kitchen','room','bathroom','hallway'], intervalDays: 7,  fixedWeekday: 6 },
+    { id: 'p06', name: 'Пропылесосить квартиру',                              zones: ['kitchen','room','bathroom','hallway'], intervalDays: 7,  fixedWeekday: null },
+    { id: 'p07', name: 'Пропылесосить внутри дивана и диван',                  zones: ['room'],     intervalDays: 14, fixedWeekday: null },
+    { id: 'p08', name: 'Помыть полы',                                          zones: ['kitchen','room','bathroom','hallway'], intervalDays: 7,  fixedWeekday: null },
     // -- Ванная --
     { id: 'p09', name: 'Обеспылить этажерку, машинку, бочок унитаза + уксус',  zones: ['bathroom'], intervalDays: 4,  fixedWeekday: null },
     { id: 'p10', name: 'Помыть ванну санэлитом',                               zones: ['bathroom'], intervalDays: 7,  fixedWeekday: null },
@@ -39,7 +39,7 @@ const DEFAULT_PERIODIC_TASKS = [
     { id: 'p13', name: 'Залить унитаз санэлитом + ершик',                      zones: ['bathroom'], intervalDays: 3,  fixedWeekday: null },
     { id: 'p14', name: 'Помыть раковину',                                      zones: ['bathroom'], intervalDays: 3,  fixedWeekday: null },
     { id: 'p15', name: 'Протереть сидушку унитаза спирт. салфеткой',           zones: ['bathroom'], intervalDays: 2,  fixedWeekday: null },
-    { id: 'p16', name: 'Постирать коврик',                                     zones: ['bathroom'], intervalDays: 14, fixedWeekday: 6 },
+    { id: 'p16', name: 'Постирать коврик',                                     zones: ['bathroom'], intervalDays: 14, fixedWeekday: null },
     { id: 'p17', name: 'Протереть зеркало и полочку',                          zones: ['bathroom'], intervalDays: 7,  fixedWeekday: null },
     { id: 'p25', name: 'Повесить чистые банные полотенца',                     zones: ['bathroom'], intervalDays: 10, fixedWeekday: null },
     { id: 'p26', name: 'Повесить чистые полотенца для рук',                    zones: ['bathroom'], intervalDays: 5,  fixedWeekday: null },
@@ -59,7 +59,8 @@ let state = {
     dailyTasks: { morning: [], evening: [] },
     periodicTasks: [],
     todayLog: { daily: {}, periodic: {} }, // {taskId: completedTimestamp}
-    customMaintenance: [] // [{id, name, dateStr}]
+    customMaintenance: [], // [{id, name, dateStr}]
+    history: {} // {taskId: ['YYYY-MM-DD', ...]} — когда задача была сделана
 };
 
 // ===== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ =====
@@ -69,6 +70,7 @@ const STORAGE_KEYS = {
     log: 'ch_today_log',
     logDate: 'ch_log_date',
     customMaint: 'ch_custom_maintenance',
+    history: 'ch_history',
 };
 
 function saveToLocal() {
@@ -77,6 +79,7 @@ function saveToLocal() {
     localStorage.setItem(STORAGE_KEYS.log, JSON.stringify(state.todayLog));
     localStorage.setItem(STORAGE_KEYS.logDate, todayStr());
     localStorage.setItem(STORAGE_KEYS.customMaint, JSON.stringify(state.customMaintenance));
+    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
 }
 
 function loadFromLocal() {
@@ -98,6 +101,11 @@ function loadFromLocal() {
     } else {
         state.periodicTasks = initializePeriodicTasks();
     }
+    normalizePeriodicTasks(state.periodicTasks);
+
+    // История выполнения
+    state.history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '{}');
+    seedHistoryFromLastCompleted();
 
     // Лог на сегодня
     if (savedDate === today) {
@@ -143,8 +151,15 @@ function initFirebaseSync() {
             if (doc.exists) {
                 const data = doc.data();
                 if (data.dailyTasks) state.dailyTasks = data.dailyTasks;
-                if (data.periodicTasks) state.periodicTasks = data.periodicTasks;
+                let needSave = false;
+                if (data.periodicTasks) {
+                    state.periodicTasks = data.periodicTasks;
+                    needSave = normalizePeriodicTasks(state.periodicTasks);
+                }
                 if (data.customMaintenance) state.customMaintenance = data.customMaintenance;
+                if (mergeHistory(data.history)) needSave = true;
+                if (seedHistoryFromLastCompleted()) needSave = true;
+                if (needSave) save(); else saveToLocal();
                 renderAll();
                 if (typeof renderMaintenanceLog === 'function') renderMaintenanceLog();
             }
@@ -169,6 +184,7 @@ function saveToFirebase() {
         dailyTasks: state.dailyTasks,
         periodicTasks: state.periodicTasks,
         customMaintenance: state.customMaintenance,
+        history: state.history,
     }, { merge: true });
 
     db.collection('clean-happy').doc('log-' + todayStr()).set(
@@ -209,21 +225,88 @@ function addDaysStr(s, n) {
     return dateToStr(d);
 }
 
-// Подвинуть дату к ближайшему нужному дню недели (не дальше 3 дней в любую сторону)
-function snapToWeekday(s, weekday) {
-    if (weekday === null || weekday === undefined) return s;
-    const d = strToDate(s);
-    let diff = (weekday - d.getDay() + 7) % 7;
-    if (diff > 3) diff -= 7;
-    d.setDate(d.getDate() + diff);
-    return dateToStr(d);
+// Следующий срок задачи, считая от даты выполнения.
+// К дням недели задачи не привязаны (14.11.2026: у Саши график 2 через 2)
+function nextDueFrom(task, fromStr) {
+    return addDaysStr(fromStr, Math.max(1, task.intervalDays || 1));
 }
 
-// Следующий срок задачи, считая от даты выполнения
-function nextDueFrom(task, fromStr) {
-    let next = snapToWeekday(addDaysStr(fromStr, task.intervalDays), task.fixedWeekday);
-    while (next <= fromStr) next = addDaysStr(next, 7);
-    return next;
+// Снять привязку к дню недели у задач из старых сохранений.
+// Срок пересчитывается от последнего выполнения, но не раньше уже назначенного
+function normalizePeriodicTasks(tasks) {
+    let changed = false;
+    (tasks || []).forEach(t => {
+        if (t.fixedWeekday === null || t.fixedWeekday === undefined) return;
+        t.fixedWeekday = null;
+        changed = true;
+        if (t.lastCompletedAt) {
+            const fair = nextDueFrom(t, t.lastCompletedAt);
+            if (!t.nextDueAt || t.nextDueAt < fair) t.nextDueAt = fair;
+        }
+    });
+    return changed;
+}
+
+// ===== ИСТОРИЯ ВЫПОЛНЕНИЯ =====
+function addHistory(taskId, dateStr) {
+    if (!state.history) state.history = {};
+    const list = state.history[taskId] || (state.history[taskId] = []);
+    if (!list.includes(dateStr)) {
+        list.push(dateStr);
+        list.sort();
+    }
+}
+
+function removeHistory(taskId, dateStr) {
+    if (!state.history || !state.history[taskId]) return;
+    state.history[taskId] = state.history[taskId].filter(d => d !== dateStr);
+}
+
+// Объединить историю с другого устройства/из облака. true — если что-то добавилось
+function mergeHistory(other) {
+    if (!other) return false;
+    if (!state.history) state.history = {};
+    let added = false;
+    Object.entries(other).forEach(([id, dates]) => {
+        (dates || []).forEach(d => {
+            if (!(state.history[id] || []).includes(d)) { addHistory(id, d); added = true; }
+        });
+    });
+    return added;
+}
+
+// До 14.11.2026 история не велась — берём хотя бы последнюю дату каждой задачи
+function seedHistoryFromLastCompleted() {
+    if (!state.history) state.history = {};
+    let added = false;
+    state.periodicTasks.forEach(t => {
+        if (t.lastCompletedAt && !(state.history[t.id] || []).includes(t.lastCompletedAt)) {
+            addHistory(t.id, t.lastCompletedAt);
+            added = true;
+        }
+    });
+    return added;
+}
+
+// Firebase хранит отдельную запись на каждый день (log-ГГГГ-ММ-ДД) — переносим их в историю один раз
+function importHistoryFromFirebaseLogs() {
+    if (!useFirebase || !db) return;
+    if (localStorage.getItem('ch_history_fb_imported')) return;
+    db.collection('clean-happy').get().then(snap => {
+        const found = {};
+        snap.forEach(doc => {
+            const m = /^log-(\d{4}-\d{2}-\d{2})$/.exec(doc.id);
+            if (!m) return;
+            const periodic = (doc.data() || {}).periodic || {};
+            Object.keys(periodic).forEach(id => {
+                (found[id] || (found[id] = [])).push(m[1]);
+            });
+        });
+        if (mergeHistory(found)) save();
+        localStorage.setItem('ch_history_fb_imported', '1');
+        const modal = document.getElementById('historyModal');
+        if (modal && modal.classList.contains('open')) renderHistory();
+    }).catch(e => console.warn('Импорт истории из Firebase не удался:', e));
 }
 
 function todayDate() {
@@ -307,7 +390,7 @@ function renderDate() {
     const { day, full } = formatDate(todayDate());
     const dayEl = document.getElementById('dateDay');
     if (dayEl) dayEl.textContent = `| ${day}`;
-    
+
     const fullEl = document.getElementById('dateFull');
     if (fullEl) fullEl.textContent = full;
 }
@@ -328,7 +411,7 @@ function renderProgress() {
 
     const allDaily = [...state.dailyTasks.morning, ...state.dailyTasks.evening];
     const doneDaily = allDaily.filter(t => !!state.todayLog.daily[t.id]).length;
-    
+
     const donePeriodic = todayOnly.filter(t => !!state.todayLog.periodic[t.id]).length;
     const done = doneDaily + donePeriodic;
 
@@ -439,7 +522,7 @@ function renderZoneTiles() {
         } else {
             zoneClass = 'zone-multi';
             const gradientColors = task.zones.map(z => ZONES[z]?.color || '#CCC');
-            
+
             if (!isCompleted && !isOverdue) {
                 tile.style.background = gradientColors[0];
             }
@@ -465,43 +548,28 @@ function renderZoneTiles() {
             <div class="zone-tile-icon">${icons}</div>
             <div class="zone-tile-name">${task.name}</div>
             <div class="zone-tile-badge">\u043a\u0430\u0436\u0434\u044b\u0435 ${task.intervalDays} \u0434\u043d.</div>
+            ${isCompleted ? '' : '<button class="zone-tile-postpone" type="button" aria-label="Отложить"><i class="ph-bold ph-clock"></i></button>'}
             <div class="zone-checkmark">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
             ${overdueBadge}
         `;
 
-        let pressTimer = null;
-        let isLongPress = false;
-        let startY = 0;
-        let startX = 0;
-        let isSwiping = false;
+        // Касание плитки — «сделано». Отложить — только кнопкой с часами.
+        // Долгое нажатие убрано 14.11.2026: на телефоне оно выделяло текст
+        // и при дрогнувшем пальце срабатывало как «сделано»
+        tile.addEventListener('click', (e) => {
+            if (e.target.closest('.zone-tile-postpone')) return;
+            togglePeriodicTask(task.id, tile);
+        });
 
-        tile.addEventListener('pointerdown', (e) => {
-            isLongPress = false;
-            isSwiping = false;
-            startX = e.clientX;
-            startY = e.clientY;
-            
-            // Если пошел скролл, pointercancel отменит таймаут
-            pressTimer = setTimeout(() => {
-                isLongPress = true;
+        const postponeBtn = tile.querySelector('.zone-tile-postpone');
+        if (postponeBtn) {
+            postponeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 showPostponePopup(task, tile);
-            }, 700);
-        });
-
-        tile.addEventListener('pointerup', (e) => {
-            clearTimeout(pressTimer);
-            if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
-                isSwiping = true;
-            }
-            if (!isLongPress && !isSwiping) {
-                togglePeriodicTask(task.id, tile);
-            }
-        });
-
-        tile.addEventListener('pointercancel', () => clearTimeout(pressTimer));
-        tile.addEventListener('pointerleave', () => clearTimeout(pressTimer));
+            });
+        }
 
         grid.appendChild(tile);
     });
@@ -514,7 +582,7 @@ function renderZoneTiles() {
             return !isCompleted && t.nextDueAt < today;
         });
         btnForgive.style.display = hasOverdue ? 'flex' : 'none';
-        
+
         // Отвязываем старые обработчики во избежание множения кликов
         const newBtnForgive = btnForgive.cloneNode(true);
         btnForgive.parentNode.replaceChild(newBtnForgive, btnForgive);
@@ -534,27 +602,20 @@ function showPostponePopup(task, tile) {
     popup.className = 'postpone-popup';
     popup.innerHTML = `
         <div class="postpone-title">${task.name}</div>
-        <div class="postpone-form">
-            <span class="postpone-label">\u041f\u0435\u0440\u0435\u0434\u0432\u0438\u043d\u0443\u0442\u044c \u043d\u0430</span>
-            <input type="number" class="postpone-input" value="3" min="1" max="365">
-            <span class="postpone-label">\u0434\u043d.</span>
+        <div class="postpone-label">Отложить на</div>
+        <div class="postpone-chips">
+            ${[1, 2, 3, 7].map(n => `<button class="postpone-chip" type="button" data-days="${n}">+${n}</button>`).join('')}
         </div>
-        <button class="postpone-submit">\u0413\u043e\u0442\u043e\u0432\u043e</button>
+        <div class="postpone-label">дней</div>
     `;
 
-    const input = popup.querySelector('.postpone-input');
-    const submitBtn = popup.querySelector('.postpone-submit');
-
-    const doPostpone = () => {
-        const days = parseInt(input.value, 10);
-        if (days && days > 0) {
-            postponeTask(task.id, days);
+    popup.querySelectorAll('.postpone-chip').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            postponeTask(task.id, parseInt(btn.dataset.days, 10));
             overlay.remove();
-        }
-    };
-
-    submitBtn.addEventListener('click', (e) => { e.stopPropagation(); doPostpone(); });
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doPostpone(); });
+        });
+    });
 
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) overlay.remove();
@@ -562,8 +623,6 @@ function showPostponePopup(task, tile) {
 
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
-    input.focus();
-    input.select();
 }
 
 function postponeTask(taskId, days) {
@@ -589,7 +648,8 @@ function saveSnapshot(label) {
         label,
         periodicTasks: JSON.parse(JSON.stringify(state.periodicTasks)),
         todayLog: JSON.parse(JSON.stringify(state.todayLog)),
-        historyStat: state.historyStat ? JSON.parse(JSON.stringify(state.historyStat)) : {}
+        historyStat: state.historyStat ? JSON.parse(JSON.stringify(state.historyStat)) : {},
+        history: JSON.parse(JSON.stringify(state.history || {}))
     };
 }
 
@@ -598,6 +658,7 @@ function performUndo() {
     state.periodicTasks = undoSnapshot.periodicTasks;
     state.todayLog = undoSnapshot.todayLog;
     state.historyStat = undoSnapshot.historyStat;
+    if (undoSnapshot.history) state.history = undoSnapshot.history;
     undoSnapshot = null;
     save();
     updateTodayStat();
@@ -641,7 +702,7 @@ function forgiveOverdueTasks() {
     // 2. Считаем текущую загрузку будущих дней и собираем долги
     state.periodicTasks.forEach(task => {
         const isCompleted = !!(state.todayLog.periodic && state.todayLog.periodic[task.id]);
-        
+
         if (!isCompleted && task.nextDueAt < today) {
             overdueTasks.push(task); // Это долг
         } else if (loadByDay[task.nextDueAt] !== undefined && !isCompleted) {
@@ -714,7 +775,7 @@ function renderMaintenanceLog() {
 
         const li = document.createElement('li');
         li.className = 'maintenance-item custom-maintenance';
-        
+
         li.innerHTML = `
             <div class="maintenance-info" style="width: 100%; gap: 8px;">
                 <textarea class="custom-maint-name" placeholder="Название дела" rows="1" style="resize:none; overflow:hidden;">${task.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
@@ -731,7 +792,7 @@ function renderMaintenanceLog() {
         const nameInput = li.querySelector('.custom-maint-name');
         const dateInput = li.querySelector('.custom-maint-date');
         const delBtn = li.querySelector('.btn-delete-task');
-        
+
         const autoResize = () => { nameInput.style.height = 'auto'; nameInput.style.height = nameInput.scrollHeight + 'px'; };
         nameInput.addEventListener('input', autoResize);
         setTimeout(autoResize, 0);
@@ -753,11 +814,11 @@ function renderMaintenanceLog() {
 
         nameInput.addEventListener('blur', applyChange);
         dateInput.addEventListener('change', applyChange);
-        nameInput.addEventListener('keydown', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                nameInput.blur(); 
-            } 
+        nameInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                nameInput.blur();
+            }
         });
 
         delBtn.addEventListener('click', () => {
@@ -801,11 +862,11 @@ function renderMaintenanceLog() {
     };
 
     newNameInput.addEventListener('blur', handleAdd);
-    newNameInput.addEventListener('keydown', (e) => { 
+    newNameInput.addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
-            e.preventDefault(); 
-            newNameInput.blur(); 
-        } 
+            e.preventDefault();
+            newNameInput.blur();
+        }
     });
 
     list.appendChild(emptyLi);
@@ -839,7 +900,7 @@ function renderExtraDoneList() {
     const extraTasks = state.periodicTasks.filter(t => {
         const isDoneToday = !!state.todayLog.periodic[t.id];
         return !isDoneToday;
-    });
+    }).sort((a, b) => zoneGroupOrder(a) - zoneGroupOrder(b));
 
     if (extraTasks.length === 0) {
         list.innerHTML = '<div class="extra-done-empty">\u0412\u0441\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0443\u0436\u0435 \u043d\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f!</div>';
@@ -876,6 +937,7 @@ function completeExtraTask(taskId) {
 
     // Mark as done today (not overdue — this is voluntary)
     state.todayLog.periodic[taskId] = { time: Date.now(), wasOverdue: false };
+    addHistory(taskId, todayStr());
 
     // Shift nextDueAt forward from today
     task.lastCompletedAt = todayStr();
@@ -902,7 +964,7 @@ function completeExtraTask(taskId) {
 function updateTodayStat() {
     if (!state.historyStat) state.historyStat = {};
     const today = todayStr();
-    
+
     const totalDaily = state.dailyTasks.morning.length + state.dailyTasks.evening.length;
     const todayPeriodic = getPeriodicTasksForToday();
     // Exclude overdue: only count tasks due today (not past-due)
@@ -916,7 +978,7 @@ function updateTodayStat() {
 
     const allDaily = [...state.dailyTasks.morning, ...state.dailyTasks.evening];
     const doneDaily = allDaily.filter(t => !!state.todayLog.daily[t.id]).length;
-    
+
     const donePeriodic = todayOnly.filter(t => !!state.todayLog.periodic[t.id]).length;
     const done = doneDaily + donePeriodic;
 
@@ -965,9 +1027,11 @@ function togglePeriodicTask(taskId, element) {
     if (state.todayLog.periodic[taskId]) {
         // Отмена выполнения
         delete state.todayLog.periodic[taskId];
+        removeHistory(taskId, today);
         if (task) {
             task.nextDueAt = todayStr();
-            task.lastCompletedAt = null;
+            const prev = (state.history[taskId] || []).slice(-1)[0];
+            task.lastCompletedAt = prev || null;
         }
         // Overdue: need full re-render to show tile again
         if (wasOverdue) {
@@ -980,6 +1044,7 @@ function togglePeriodicTask(taskId, element) {
     } else {
         // Выполнено!
         state.todayLog.periodic[taskId] = { time: Date.now(), wasOverdue: wasOverdue };
+        addHistory(taskId, today);
         if (task) {
             task.lastCompletedAt = todayStr();
             task.nextDueAt = nextDueFrom(task, todayStr());
@@ -1122,7 +1187,7 @@ function initSettingsModal() {
 function loadFirebaseSettingsToUI() {
     const saved = localStorage.getItem('ch_firebase_config');
     const statusEl = document.getElementById('fbStatus');
-    
+
     if (saved) {
         const config = JSON.parse(saved);
         document.getElementById('fbApiKey').value = config.apiKey || '';
@@ -1132,7 +1197,7 @@ function loadFirebaseSettingsToUI() {
         document.getElementById('fbSenderId').value = config.messagingSenderId || '';
         document.getElementById('fbAppId').value = config.appId || '';
     }
-    
+
     if (useFirebase) {
         statusEl.innerHTML = '<span style="color: #10B981;">🟢 Подключено к Firebase</span>';
     } else {
@@ -1149,17 +1214,17 @@ function saveFirebaseSettings() {
         messagingSenderId: document.getElementById('fbSenderId').value.trim(),
         appId: document.getElementById('fbAppId').value.trim()
     };
-    
+
     if (!config.apiKey || config.apiKey.includes('Key') || config.apiKey === 'YOUR_API_KEY') {
         alert('Пожалуйста, введите корректный API Key');
         return;
     }
-    
+
     localStorage.setItem('ch_firebase_config', JSON.stringify(config));
-    
+
     const statusEl = document.getElementById('fbStatus');
     statusEl.innerHTML = '<span style="color: #3B82F6;">💾 Настройки сохранены! Перезагрузка для активации...</span>';
-    
+
     setTimeout(() => {
         window.location.reload();
     }, 1200);
@@ -1254,13 +1319,11 @@ function renderSettingsPeriodicList() {
             return zone ? `<span class="zone-badge" style="background:${zone.color}" title="${zone.name}"></span>` : '';
         }).join('');
 
-        const weekdays = ['\u0412\u0441', '\u041f\u043d', '\u0412\u0442', '\u0421\u0440', '\u0427\u0442', '\u041f\u0442', '\u0421\u0431'];
-        const fixedDay = task.fixedWeekday !== null ? ` (${weekdays[task.fixedWeekday]})` : '';
 
         li.innerHTML = `
             <div class="task-zones-badges">${zoneBadges}</div>
             <span class="task-name" title="\u041d\u0430\u0436\u043c\u0438, \u0447\u0442\u043e\u0431\u044b \u043f\u0435\u0440\u0435\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u0442\u044c">${task.name}</span>
-            <span class="task-interval" data-task-id="${task.id}" title="\u041d\u0430\u0436\u043c\u0438, \u0447\u0442\u043e\u0431\u044b \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c">${task.intervalDays} \u0434\u043d.${fixedDay}</span>
+            <span class="task-interval" data-task-id="${task.id}" title="\u041d\u0430\u0436\u043c\u0438, \u0447\u0442\u043e\u0431\u044b \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c">${task.intervalDays} \u0434\u043d.</span>
             <button class="btn-delete-task" data-id="${task.id}" aria-label="Delete">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -1364,8 +1427,6 @@ function addPeriodicTask() {
     if (!name) return;
 
     const interval = parseInt(document.getElementById('inputInterval').value) || 7;
-    const weekdaySelect = document.getElementById('inputWeekday').value;
-    const fixedWeekday = weekdaySelect ? parseInt(weekdaySelect) : null;
 
     const zoneChecks = document.querySelectorAll('#zoneCheckboxes input[type="checkbox"]:checked');
     const zones = Array.from(zoneChecks).map(c => c.value);
@@ -1379,7 +1440,7 @@ function addPeriodicTask() {
         name: name,
         zones: zones,
         intervalDays: interval,
-        fixedWeekday: fixedWeekday,
+        fixedWeekday: null,
         nextDueAt: todayStr(),
         lastCompletedAt: null,
     };
@@ -1389,7 +1450,6 @@ function addPeriodicTask() {
     // Clear form
     document.getElementById('inputPeriodicName').value = '';
     document.getElementById('inputInterval').value = '7';
-    document.getElementById('inputWeekday').value = '';
     document.querySelectorAll('#zoneCheckboxes input[type="checkbox"]').forEach(c => c.checked = false);
 
     save();
@@ -1639,8 +1699,12 @@ function renderCalendarDayTasks(dateStr) {
     const { day, full } = formatDate(d);
     titleEl.textContent = `${day}, ${full}`;
 
-    const periodicTasks = getPeriodicTasksForDate(dateStr);
     const isToday = dateStr === todayStr();
+    const isPast = dateStr < todayStr();
+    // Прошедший день — что реально было сделано; сегодня и дальше — план
+    const periodicTasks = isPast
+        ? state.periodicTasks.filter(t => (state.history[t.id] || []).includes(dateStr))
+        : getPeriodicTasksForDate(dateStr);
 
     listEl.innerHTML = '';
 
@@ -1687,6 +1751,102 @@ function renderCalendarDayTasks(dateStr) {
     if (allDaily.length === 0 && periodicTasks.length === 0) {
         listEl.innerHTML = '<li class="cal-task-item" style="justify-content:center;color:var(--text-muted)">Нет задач на этот день</li>';
     }
+}
+
+// ===== ЭКРАН «ИСТОРИЯ» =====
+const ZONE_GROUP_ORDER = ['multi', 'kitchen', 'room', 'bathroom', 'hallway'];
+
+function zoneGroupKey(task) {
+    return task.zones && task.zones.length === 1 ? task.zones[0] : 'multi';
+}
+
+function zoneGroupOrder(task) {
+    const i = ZONE_GROUP_ORDER.indexOf(zoneGroupKey(task));
+    return i === -1 ? 99 : i;
+}
+
+function daysWord(n) {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'день';
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'дня';
+    return 'дней';
+}
+
+function agoText(dateStr) {
+    const diff = Math.round((strToDate(todayStr()) - strToDate(dateStr)) / 86400000);
+    if (diff <= 0) return 'сегодня';
+    if (diff === 1) return 'вчера';
+    return `${diff} ${daysWord(diff)} назад`;
+}
+
+function shortDateText(dateStr) {
+    const { day, full } = formatDate(strToDate(dateStr));
+    return `${day}, ${full}`;
+}
+
+function initHistory() {
+    const modal = document.getElementById('historyModal');
+    const btnOpen = document.getElementById('btnHistory');
+    const btnClose = document.getElementById('historyClose');
+    if (!modal || !btnOpen || !btnClose) return;
+
+    btnOpen.addEventListener('click', () => {
+        modal.classList.add('open');
+        renderHistory();
+        importHistoryFromFirebaseLogs();
+    });
+    btnClose.addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('open');
+    });
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    const groups = {};
+    state.periodicTasks.forEach(t => {
+        (groups[zoneGroupKey(t)] || (groups[zoneGroupKey(t)] = [])).push(t);
+    });
+
+    ZONE_GROUP_ORDER.concat(Object.keys(groups).filter(k => !ZONE_GROUP_ORDER.includes(k)))
+        .filter(k => groups[k])
+        .forEach(key => {
+            const zone = ZONES[key];
+            const color = zone ? zone.color : 'var(--primary)';
+            const groupName = zone ? zone.name : 'Вся квартира';
+
+            const section = document.createElement('li');
+            section.className = 'history-group';
+            section.style.setProperty('--zone-color', color);
+            section.innerHTML = `<div class="history-group-title">${groupName}</div><ul class="history-tasks"></ul>`;
+            const ul = section.querySelector('.history-tasks');
+
+            groups[key].forEach(task => {
+                const dates = (state.history[task.id] || []).slice().sort().reverse();
+                const last = dates[0];
+                const li = document.createElement('li');
+                li.className = 'history-task';
+                li.innerHTML = `
+                    <details>
+                        <summary>
+                            <span class="history-task-name">${task.name}</span>
+                            <span class="history-task-last">${last
+                                ? `<b>${agoText(last)}</b> · ${shortDateText(last)}`
+                                : 'ещё не отмечалось'}</span>
+                        </summary>
+                        <ul class="history-dates">
+                            ${dates.map(d => `<li><span>${shortDateText(d)}</span><span class="history-ago">${agoText(d)}</span></li>`).join('')}
+                        </ul>
+                    </details>
+                `;
+                if (!last) li.querySelector('details').classList.add('empty');
+                ul.appendChild(li);
+            });
+            list.appendChild(section);
+        });
 }
 
 // ===== ЭФФЕКТЫ =====
@@ -1792,7 +1952,7 @@ function applyTimeTheme() {
     const hour = new Date().getHours();
     const body = document.body;
     body.classList.remove('theme-day', 'theme-blueberry');
-    
+
     const stop0 = document.querySelector('#ring-gradient stop:first-child');
     const stop1 = document.querySelector('#ring-gradient stop:last-child');
 
@@ -1811,7 +1971,7 @@ function applyTimeTheme() {
         if (stop1) { stop1.setAttribute('stop-color', '#af85b6'); }
         if (themeMeta) themeMeta.setAttribute('content', '#5a466b'); /* Тёмно-черничный цвет шторки */
     }
-    
+
     // Оставляем исходный звук, чтобы не ломать логику пользователю (УДАЛЕНО)
 
     // Обновить иконку динамика
@@ -1958,6 +2118,7 @@ function init() {
     }
 
     initSettingsModal();
+    initHistory();
     initCalendar();
     if (typeof initMaintenanceLog === 'function') initMaintenanceLog();
     initExtraDone();

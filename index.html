@@ -15,7 +15,7 @@
     <!-- Библиотека иконок Phosphor -->
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/icons.css">
     <!-- CSS -->
-    <link rel="stylesheet" href="main-style.css?v=64">
+    <link rel="stylesheet" href="main-style.css?v=65">
 </head>
 <body>
     <!-- Конфетти-контейнер -->
@@ -31,6 +31,9 @@
                 </button>
                 <button class="btn-calendar" id="btnCalendar" title="Календарь">
                     <i class="ph-bold ph-calendar-blank"></i>
+                </button>
+                <button class="btn-history" id="btnHistory" title="История">
+                    <i class="ph-bold ph-clock-counter-clockwise"></i>
                 </button>
                 <button class="btn-log" id="btnLog" title="Журнал редких дел">
                     <i class="ph-bold ph-notebook"></i>
@@ -175,19 +178,6 @@
                             Интервал (дней):
                             <input type="number" class="input-number" id="inputInterval" min="1" max="90" value="7">
                         </label>
-                        <label>
-                            День недели:
-                            <select class="input-select" id="inputWeekday">
-                                <option value="">Любой</option>
-                                <option value="1">Понедельник</option>
-                                <option value="2">Вторник</option>
-                                <option value="3">Среда</option>
-                                <option value="4">Четверг</option>
-                                <option value="5">Пятница</option>
-                                <option value="6">Суббота</option>
-                                <option value="0">Воскресенье</option>
-                            </select>
-                        </label>
                     </div>
                     <button class="btn-add-periodic" id="btnAddPeriodic">Добавить задачу</button>
                 </div>
@@ -248,6 +238,17 @@
         </div>
     </div>
 
+    <!-- История выполнения -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>История</h2>
+                <button class="modal-close" id="historyClose"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <ul class="history-list" id="historyList"></ul>
+        </div>
+    </div>
+
     <!-- Журнал редких дел -->
     <div class="modal-overlay" id="maintenanceModal">
         <div class="modal-content">
@@ -267,8 +268,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=64"></script>
-    <script src="main-app.js?v=64"></script>
+    <script src="firebase-config.js?v=65"></script>
+    <script src="main-app.js?v=65"></script>
     <script>
         // ЖЕСТКОЕ ОТКЛЮЧЕНИЕ PWA-КЭША ДЛЯ ОТЛАДКИ (ПО ПРАВИЛАМ DASHBOARD.MD)
         if ('serviceWorker' in navigator) {
